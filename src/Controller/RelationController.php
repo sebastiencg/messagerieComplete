@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Profile;
 use App\Entity\Relation;
 use App\Entity\RequestRelation;
+use App\Repository\ProfileRepository;
 use App\Repository\RelationRepository;
 use App\Repository\RequestRelationRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -12,6 +13,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Serializer\SerializerInterface;
 
 #[Route('/api/relation')]
 class RelationController extends AbstractController
@@ -19,10 +21,22 @@ class RelationController extends AbstractController
     #[Route('/', name: 'app_relation_index', methods: ['GET'])]
     public function index(RelationRepository $relationRepository): Response
     {
-        return $this->json($relationRepository->relationCustom2($this->getUser()->getProfile()->getId()),200,[],['groups'=>'relation:read-one']);
+        return $this->json($relationRepository->relationCustom2($this->getUser()->getProfile()->getId()),200,[],['groups'=>'relation:read-onlyRelation']);
+    }
+    #[Route('/allProfile/', name: 'app_relation_index_all', methods: ['GET'])]
+    public function allProfile(ProfileRepository $profileRepository): Response
+    {
+        return $this->json($profileRepository->findBy(["visibility"=>true]),200,[],['groups'=>'relation:read-one']);
     }
 
+    #[Route('/searchProfile/', name: 'app_relation_searchProfile', methods: ['POST'])]
+    public function searchProfile(ProfileRepository $profileRepository, Request $request ,SerializerInterface $serializer): Response
+    {
+        $json = $request->getContent();
+        $profile = $serializer->deserialize($json,Profile::class,'json');
 
+        return $this->json($profileRepository->findBy(["username"=>$profile->getUsername()]),200,[],['groups'=>'profile:read-one']);
+    }
     #[Route('/new/{id}', name: 'app_relation_new', methods: ['GET', 'POST'])]
     public function new(Request $request,Profile $profile ,EntityManagerInterface $entityManager, RequestRelationRepository $requestRelationRepository): Response
     {
@@ -118,7 +132,7 @@ class RelationController extends AbstractController
         return $this->json("error",200);
     }
 
-    #[Route('/Denied/{id}', name: 'app_relation_denied', methods: ['GET'])]
+    #[Route('/denied/{id}', name: 'app_relation_denied', methods: ['DELETE'])]
     public function relationDenied(Profile $profile,RelationRepository $relationRepository, EntityManagerInterface $entityManager): Response
     {
         $relation=$relationRepository->relationCustom1($this->getUser()->getProfile()->getId(),$profile);

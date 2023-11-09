@@ -12,25 +12,24 @@ class Relation
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['relation:read-one'])]
+    #[Groups(['relation:read-one','relation:read-onlyRelation'])]
 
     private ?int $id = null;
 
-    #[ORM\ManyToOne(inversedBy: 'relations')]
-    #[Groups(['relation:read-one'])]
-
+    #[ORM\ManyToOne(inversedBy: 'relationSend')]
+    #[Groups(['relation:read-onlyRelation'])]
     private ?Profile $profile1 = null;
 
-    #[ORM\ManyToOne(inversedBy: 'relations2')]
-    #[Groups(['relation:read-one'])]
+    #[ORM\ManyToOne(inversedBy: 'relationRequest')]
+    #[Groups(['relation:read-onlyRelation'])]
+
     private ?Profile $profile2 = null;
 
     #[ORM\Column]
-    #[Groups(['relation:read-one'])]
+    #[Groups(['relation:read-one','relation:read-onlyRelation'])]
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\OneToOne(mappedBy: 'relation', cascade: ['persist', 'remove'])]
-    #[Groups(['relation:read-one'])]
     private ?RequestRelation $requestRelation = null;
 
     public function getId(): ?int

@@ -12,27 +12,27 @@ class RequestRelation
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['relation:read-one'])]
+    #[Groups(['relation:read-one','profile:read-all'])]
 
     private ?int $id = null;
 
     #[ORM\ManyToOne(inversedBy: 'requestRelations')]
-    #[Groups(['relation:read-one'])]
+    #[Groups(['profile:read-all','relation:read-one'])]
 
     private ?Profile $host = null;
 
     #[ORM\ManyToOne(inversedBy: 'requestRelations')]
-    #[Groups(['relation:read-one'])]
+    #[Groups(['relation:read-one','profile:read-all'])]
 
     private ?Profile $guests = null;
 
     #[ORM\Column(length: 10)]
-    #[Groups(['relation:read-one'])]
+    #[Groups(['relation:read-one','profile:read-all'])]
 
     private ?string $statue = null;
 
     #[ORM\OneToOne(inversedBy: 'requestRelation', cascade: ['persist', 'remove'])]
-    #[Groups(['relation:read-one'])]
+    #[Groups(['relation:read-one','profile:read-all'])]
     private ?Relation $relation = null;
 
     public function getId(): ?int

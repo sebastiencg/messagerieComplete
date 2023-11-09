@@ -15,7 +15,7 @@ Profile
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['relation:read-one'])]
+    #[Groups(['relation:read-one','profile:read-one','profile:read-all','relation:read-onlyRelation'])]
     private ?int $id = null;
 
     #[ORM\OneToOne(inversedBy: 'profile', cascade: ['persist', 'remove'])]
@@ -24,27 +24,31 @@ Profile
     private ?User $ofUser = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['relation:read-one'])]
+    #[Groups(['relation:read-one','profile:read-one','profile:read-all','relation:read-onlyRelation'])]
 
     private ?string $username = null;
 
     #[ORM\OneToMany(mappedBy: 'host', targetEntity: RequestRelation::class)]
+    #[Groups(['profile:read-all'])]
     private Collection $requestRelations;
 
     #[ORM\OneToMany(mappedBy: 'profile1', targetEntity: Relation::class)]
-    private Collection $relations;
+    #[Groups(['profile:read-all'])]
+    private Collection $relationSend;
 
     #[ORM\OneToMany(mappedBy: 'profile2', targetEntity: Relation::class)]
-    private Collection $relations2;
+    #[Groups(['profile:read-all'])]
+    private Collection $relationRequest;
 
     #[ORM\Column]
+    #[Groups(['profile:read-all'])]
     private ?bool $visibility = null;
 
     public function __construct()
     {
         $this->requestRelations = new ArrayCollection();
-        $this->relations = new ArrayCollection();
-        $this->relations2 = new ArrayCollection();
+        $this->relationSend = new ArrayCollection();
+        $this->relationRequest = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -109,15 +113,15 @@ Profile
     /**
      * @return Collection<int, Relation>
      */
-    public function getRelations(): Collection
+    public function getRelationSend(): Collection
     {
-        return $this->relations;
+        return $this->relationSend;
     }
 
     public function addRelation(Relation $relation): static
     {
-        if (!$this->relations->contains($relation)) {
-            $this->relations->add($relation);
+        if (!$this->relationSend->contains($relation)) {
+            $this->relationSend->add($relation);
             $relation->setProfile1($this);
         }
 
@@ -126,7 +130,7 @@ Profile
 
     public function removeRelation(Relation $relation): static
     {
-        if ($this->relations->removeElement($relation)) {
+        if ($this->relationSend->removeElement($relation)) {
             // set the owning side to null (unless already changed)
             if ($relation->getProfile1() === $this) {
                 $relation->setProfile1(null);
@@ -139,15 +143,15 @@ Profile
     /**
      * @return Collection<int, Relation>
      */
-    public function getRelations2(): Collection
+    public function getRelationRequest(): Collection
     {
-        return $this->relations2;
+        return $this->relationRequest;
     }
 
     public function addRelations2(Relation $relations2): static
     {
-        if (!$this->relations2->contains($relations2)) {
-            $this->relations2->add($relations2);
+        if (!$this->relationRequest->contains($relations2)) {
+            $this->relationRequest->add($relations2);
             $relations2->setProfile2($this);
         }
 
@@ -156,7 +160,7 @@ Profile
 
     public function removeRelations2(Relation $relations2): static
     {
-        if ($this->relations2->removeElement($relations2)) {
+        if ($this->relationRequest->removeElement($relations2)) {
             // set the owning side to null (unless already changed)
             if ($relations2->getProfile2() === $this) {
                 $relations2->setProfile2(null);
