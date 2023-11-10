@@ -15,7 +15,7 @@ Profile
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['relation:read-one','profile:read-one','profile:read-all','relation:read-onlyRelation'])]
+    #[Groups(['relation:read-one','profile:read-one','profile:read-all','relation:read-onlyRelation','groups'=>'groupe:read-onlyGroupe'])]
     private ?int $id = null;
 
     #[ORM\OneToOne(inversedBy: 'profile', cascade: ['persist', 'remove'])]
@@ -24,7 +24,7 @@ Profile
     private ?User $ofUser = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['relation:read-one','profile:read-one','profile:read-all','relation:read-onlyRelation'])]
+    #[Groups(['relation:read-one','profile:read-one','profile:read-all','relation:read-onlyRelation','groups'=>'groupe:read-onlyGroupe'])]
 
     private ?string $username = null;
 
@@ -44,11 +44,23 @@ Profile
     #[Groups(['profile:read-all'])]
     private ?bool $visibility = null;
 
+    #[ORM\OneToMany(mappedBy: 'master', targetEntity: Groupe::class)]
+    private Collection $masterGroupes;
+
+
+    #[ORM\ManyToMany(targetEntity: Groupe::class, mappedBy: 'member')]
+    private Collection $memberGroupes;
+
+
+
     public function __construct()
     {
         $this->requestRelations = new ArrayCollection();
         $this->relationSend = new ArrayCollection();
         $this->relationRequest = new ArrayCollection();
+        $this->masterGroupes = new ArrayCollection();
+        $this->memberGroupes = new ArrayCollection();
+
     }
 
     public function getId(): ?int
@@ -181,4 +193,64 @@ Profile
 
         return $this;
     }
+
+    /**
+     * @return Collection<int, Groupe>
+     */
+    public function getMasterGroupes(): Collection
+    {
+        return $this->masterGroupes;
+    }
+
+    public function addMasterGroupe(Groupe $masterGroupe): static
+    {
+        if (!$this->masterGroupes->contains($masterGroupe)) {
+            $this->masterGroupes->add($masterGroupe);
+            $masterGroupe->setMaster($this);
+        }
+
+        return $this;
+    }
+
+    public function removeMasterGroupe(Groupe $masterGroupe): static
+    {
+        if ($this->masterGroupes->removeElement($masterGroupe)) {
+            // set the owning side to null (unless already changed)
+            if ($masterGroupe->getMaster() === $this) {
+                $masterGroupe->setMaster(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Groupe>
+     */
+    public function getMemberGroupes(): Collection
+    {
+        return $this->memberGroupes;
+    }
+
+    public function addMemberGroupe(Groupe $memberGroupe): static
+    {
+        if (!$this->memberGroupes->contains($memberGroupe)) {
+            $this->memberGroupes->add($memberGroupe);
+            $memberGroupe->addMember($this);
+        }
+
+        return $this;
+    }
+
+    public function removeMemberGroupe(Groupe $memberGroupe): static
+    {
+        if ($this->memberGroupes->removeElement($memberGroupe)) {
+            $memberGroupe->removeMember($this);
+        }
+
+        return $this;
+    }
+
+
+
 }
