@@ -50,6 +50,9 @@ Profile
     #[ORM\OneToMany(mappedBy: 'recipient', targetEntity: PrivateMessage::class)]
     private Collection $privateMessagesReceived;
 
+    #[ORM\ManyToMany(targetEntity: Conversation::class, mappedBy: 'profile')]
+    private Collection $conversations;
+
 
 
 
@@ -61,6 +64,7 @@ Profile
         $this->relationRequest = new ArrayCollection();
         $this->privateMessagesSend = new ArrayCollection();
         $this->privateMessagesReceived = new ArrayCollection();
+        $this->conversations = new ArrayCollection();
 
 
     }
@@ -251,6 +255,33 @@ Profile
             if ($privateMessagesReceived->getRecipient() === $this) {
                 $privateMessagesReceived->setRecipient(null);
             }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Conversation>
+     */
+    public function getConversations(): Collection
+    {
+        return $this->conversations;
+    }
+
+    public function addConversation(Conversation $conversation): static
+    {
+        if (!$this->conversations->contains($conversation)) {
+            $this->conversations->add($conversation);
+            $conversation->addProfile($this);
+        }
+
+        return $this;
+    }
+
+    public function removeConversation(Conversation $conversation): static
+    {
+        if ($this->conversations->removeElement($conversation)) {
+            $conversation->removeProfile($this);
         }
 
         return $this;
