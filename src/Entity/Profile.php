@@ -15,7 +15,7 @@ Profile
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['relation:read-one','profile:read-one','profile:read-all','relation:read-onlyRelation','groups'=>'groupe:read-onlyGroupe'])]
+    #[Groups(['relation:read-one','profile:read-one','profile:read-all','relation:read-onlyRelation','groups'=>'groupe:read-onlyGroupe','privateMessage:read-message'])]
     private ?int $id = null;
 
     #[ORM\OneToOne(inversedBy: 'profile', cascade: ['persist', 'remove'])]
@@ -24,7 +24,7 @@ Profile
     private ?User $ofUser = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['relation:read-one','profile:read-one','profile:read-all','relation:read-onlyRelation','groups'=>'groupe:read-onlyGroupe'])]
+    #[Groups(['relation:read-one','profile:read-one','profile:read-all','relation:read-onlyRelation','groups'=>'groupe:read-onlyGroupe','privateMessage:read-message'])]
 
     private ?string $username = null;
 
@@ -44,12 +44,13 @@ Profile
     #[Groups(['profile:read-all'])]
     private ?bool $visibility = null;
 
-    #[ORM\OneToMany(mappedBy: 'master', targetEntity: Groupe::class)]
-    private Collection $masterGroupes;
+    #[ORM\OneToMany(mappedBy: 'author', targetEntity: PrivateMessage::class)]
+    private Collection $privateMessagesSend;
+
+    #[ORM\OneToMany(mappedBy: 'recipient', targetEntity: PrivateMessage::class)]
+    private Collection $privateMessagesReceived;
 
 
-    #[ORM\ManyToMany(targetEntity: Groupe::class, mappedBy: 'member')]
-    private Collection $memberGroupes;
 
 
 
@@ -58,8 +59,9 @@ Profile
         $this->requestRelations = new ArrayCollection();
         $this->relationSend = new ArrayCollection();
         $this->relationRequest = new ArrayCollection();
-        $this->masterGroupes = new ArrayCollection();
-        $this->memberGroupes = new ArrayCollection();
+        $this->privateMessagesSend = new ArrayCollection();
+        $this->privateMessagesReceived = new ArrayCollection();
+
 
     }
 
@@ -195,29 +197,29 @@ Profile
     }
 
     /**
-     * @return Collection<int, Groupe>
+     * @return Collection<int, PrivateMessage>
      */
-    public function getMasterGroupes(): Collection
+    public function getPrivateMessagesSend(): Collection
     {
-        return $this->masterGroupes;
+        return $this->privateMessagesSend;
     }
 
-    public function addMasterGroupe(Groupe $masterGroupe): static
+    public function addPrivateMessagesSend(PrivateMessage $privateMessagesSend): static
     {
-        if (!$this->masterGroupes->contains($masterGroupe)) {
-            $this->masterGroupes->add($masterGroupe);
-            $masterGroupe->setMaster($this);
+        if (!$this->privateMessagesSend->contains($privateMessagesSend)) {
+            $this->privateMessagesSend->add($privateMessagesSend);
+            $privateMessagesSend->setAuthor($this);
         }
 
         return $this;
     }
 
-    public function removeMasterGroupe(Groupe $masterGroupe): static
+    public function removePrivateMessagesSend(PrivateMessage $privateMessagesSend): static
     {
-        if ($this->masterGroupes->removeElement($masterGroupe)) {
+        if ($this->privateMessagesSend->removeElement($privateMessagesSend)) {
             // set the owning side to null (unless already changed)
-            if ($masterGroupe->getMaster() === $this) {
-                $masterGroupe->setMaster(null);
+            if ($privateMessagesSend->getAuthor() === $this) {
+                $privateMessagesSend->setAuthor(null);
             }
         }
 
@@ -225,27 +227,30 @@ Profile
     }
 
     /**
-     * @return Collection<int, Groupe>
+     * @return Collection<int, PrivateMessage>
      */
-    public function getMemberGroupes(): Collection
+    public function getPrivateMessagesReceived(): Collection
     {
-        return $this->memberGroupes;
+        return $this->privateMessagesReceived;
     }
 
-    public function addMemberGroupe(Groupe $memberGroupe): static
+    public function addPrivateMessagesReceived(PrivateMessage $privateMessagesReceived): static
     {
-        if (!$this->memberGroupes->contains($memberGroupe)) {
-            $this->memberGroupes->add($memberGroupe);
-            $memberGroupe->addMember($this);
+        if (!$this->privateMessagesReceived->contains($privateMessagesReceived)) {
+            $this->privateMessagesReceived->add($privateMessagesReceived);
+            $privateMessagesReceived->setRecipient($this);
         }
 
         return $this;
     }
 
-    public function removeMemberGroupe(Groupe $memberGroupe): static
+    public function removePrivateMessagesReceived(PrivateMessage $privateMessagesReceived): static
     {
-        if ($this->memberGroupes->removeElement($memberGroupe)) {
-            $memberGroupe->removeMember($this);
+        if ($this->privateMessagesReceived->removeElement($privateMessagesReceived)) {
+            // set the owning side to null (unless already changed)
+            if ($privateMessagesReceived->getRecipient() === $this) {
+                $privateMessagesReceived->setRecipient(null);
+            }
         }
 
         return $this;

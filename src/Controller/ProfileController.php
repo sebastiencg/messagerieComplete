@@ -21,7 +21,7 @@ class ProfileController extends AbstractController
         return $this->json($this->getUser()->getProfile(),200,[],['groups'=>'profile:read-all']);
     }
 
-    #[Route('/update/', name: 'app_updateProfile', methods: ['PUT'])]
+    #[Route('/update/', name: 'app_updateProfile', methods: ['PATCH'])]
     public function updateProfile(ProfileRepository $profileRepository, Request $request ,SerializerInterface $serializer, EntityManagerInterface $entityManager): Response
     {
         $json = $request->getContent();
@@ -32,5 +32,19 @@ class ProfileController extends AbstractController
         $entityManager->flush();
 
         return $this->json($profile,200,[],['groups'=>'profile:read-all']);
+    }
+    #[Route('/allProfile/', name: 'app_relation_index_all', methods: ['GET'])]
+    public function allProfile(ProfileRepository $profileRepository): Response
+    {
+        return $this->json($profileRepository->findBy(["visibility"=>true]),200,[],['groups'=>'relation:read-one']);
+    }
+
+    #[Route('/searchProfile/', name: 'app_relation_searchProfile', methods: ['POST'])]
+    public function searchProfile(ProfileRepository $profileRepository, Request $request ,SerializerInterface $serializer): Response
+    {
+        $json = $request->getContent();
+        $profile = $serializer->deserialize($json,Profile::class,'json');
+
+        return $this->json($profileRepository->findBy(["username"=>$profile->getUsername()]),200,[],['groups'=>'profile:read-one']);
     }
 }

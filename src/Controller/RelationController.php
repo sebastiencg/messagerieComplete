@@ -23,20 +23,6 @@ class RelationController extends AbstractController
     {
         return $this->json($relationRepository->relationCustom2($this->getUser()->getProfile()->getId()),200,[],['groups'=>'relation:read-onlyRelation']);
     }
-    #[Route('/allProfile/', name: 'app_relation_index_all', methods: ['GET'])]
-    public function allProfile(ProfileRepository $profileRepository): Response
-    {
-        return $this->json($profileRepository->findBy(["visibility"=>true]),200,[],['groups'=>'relation:read-one']);
-    }
-
-    #[Route('/searchProfile/', name: 'app_relation_searchProfile', methods: ['POST'])]
-    public function searchProfile(ProfileRepository $profileRepository, Request $request ,SerializerInterface $serializer): Response
-    {
-        $json = $request->getContent();
-        $profile = $serializer->deserialize($json,Profile::class,'json');
-
-        return $this->json($profileRepository->findBy(["username"=>$profile->getUsername()]),200,[],['groups'=>'profile:read-one']);
-    }
     #[Route('/new/{id}', name: 'app_relation_new', methods: ['GET', 'POST'])]
     public function new(Request $request,Profile $profile ,EntityManagerInterface $entityManager, RequestRelationRepository $requestRelationRepository): Response
     {
@@ -80,7 +66,9 @@ class RelationController extends AbstractController
     public function requestValid(Profile $profile,RequestRelationRepository $requestRelationRepository, EntityManagerInterface $entityManager): Response
     {
         $requestRelation=$requestRelationRepository->findOneBy(['host'=>$profile,'guests'=>$this->getUser()->getProfile()]);
-
+        if (!$requestRelation){
+            return $this->json("error",200);
+        }
         if ($requestRelation->getStatue()=="on hold"){
             $requestRelation->setStatue("accept");
             $relation = new Relation();
