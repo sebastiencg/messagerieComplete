@@ -53,6 +53,12 @@ Profile
     #[ORM\ManyToMany(targetEntity: Conversation::class, mappedBy: 'profile')]
     private Collection $conversations;
 
+    #[ORM\OneToMany(mappedBy: 'author', targetEntity: Conversation::class)]
+    private Collection $conversationCreated;
+
+    #[ORM\OneToMany(mappedBy: 'author', targetEntity: ConversationMessage::class)]
+    private Collection $conversationMessages;
+
 
 
 
@@ -65,6 +71,8 @@ Profile
         $this->privateMessagesSend = new ArrayCollection();
         $this->privateMessagesReceived = new ArrayCollection();
         $this->conversations = new ArrayCollection();
+        $this->conversationCreated = new ArrayCollection();
+        $this->conversationMessages = new ArrayCollection();
 
 
     }
@@ -282,6 +290,66 @@ Profile
     {
         if ($this->conversations->removeElement($conversation)) {
             $conversation->removeProfile($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Conversation>
+     */
+    public function getConversationCreated(): Collection
+    {
+        return $this->conversationCreated;
+    }
+
+    public function addConversationCreated(Conversation $conversationCreated): static
+    {
+        if (!$this->conversationCreated->contains($conversationCreated)) {
+            $this->conversationCreated->add($conversationCreated);
+            $conversationCreated->setAuthor($this);
+        }
+
+        return $this;
+    }
+
+    public function removeConversationCreated(Conversation $conversationCreated): static
+    {
+        if ($this->conversationCreated->removeElement($conversationCreated)) {
+            // set the owning side to null (unless already changed)
+            if ($conversationCreated->getAuthor() === $this) {
+                $conversationCreated->setAuthor(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, ConversationMessage>
+     */
+    public function getConversationMessages(): Collection
+    {
+        return $this->conversationMessages;
+    }
+
+    public function addConversationMessage(ConversationMessage $conversationMessage): static
+    {
+        if (!$this->conversationMessages->contains($conversationMessage)) {
+            $this->conversationMessages->add($conversationMessage);
+            $conversationMessage->setAuthor($this);
+        }
+
+        return $this;
+    }
+
+    public function removeConversationMessage(ConversationMessage $conversationMessage): static
+    {
+        if ($this->conversationMessages->removeElement($conversationMessage)) {
+            // set the owning side to null (unless already changed)
+            if ($conversationMessage->getAuthor() === $this) {
+                $conversationMessage->setAuthor(null);
+            }
         }
 
         return $this;

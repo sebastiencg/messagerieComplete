@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\RelationRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
 
@@ -31,6 +33,14 @@ class Relation
 
     #[ORM\OneToOne(mappedBy: 'relation', cascade: ['persist', 'remove'])]
     private ?RequestRelation $requestRelation = null;
+
+    #[ORM\OneToMany(mappedBy: 'ralationId', targetEntity: PrivateMessage::class)]
+    private Collection $privateMessages;
+
+    public function __construct()
+    {
+        $this->privateMessages = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -91,6 +101,36 @@ class Relation
         }
 
         $this->requestRelation = $requestRelation;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, PrivateMessage>
+     */
+    public function getPrivateMessages(): Collection
+    {
+        return $this->privateMessages;
+    }
+
+    public function addPrivateMessage(PrivateMessage $privateMessage): static
+    {
+        if (!$this->privateMessages->contains($privateMessage)) {
+            $this->privateMessages->add($privateMessage);
+            $privateMessage->setRalationId($this);
+        }
+
+        return $this;
+    }
+
+    public function removePrivateMessage(PrivateMessage $privateMessage): static
+    {
+        if ($this->privateMessages->removeElement($privateMessage)) {
+            // set the owning side to null (unless already changed)
+            if ($privateMessage->getRalationId() === $this) {
+                $privateMessage->setRalationId(null);
+            }
+        }
 
         return $this;
     }

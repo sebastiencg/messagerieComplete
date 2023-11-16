@@ -7,6 +7,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: ConversationRepository::class)]
 class Conversation
@@ -14,36 +15,33 @@ class Conversation
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['privateMessage:read-message','conversation:read-conversation'])]
+
     private ?int $id = null;
 
-    #[ORM\Column(type: Types::TEXT)]
-    private ?string $content = null;
-
     #[ORM\ManyToMany(targetEntity: Profile::class, inversedBy: 'conversations')]
+    #[Groups(['privateMessage:read-message','conversation:read-conversation'])]
     private Collection $profile;
+
+    #[ORM\OneToMany(mappedBy: 'conversation', targetEntity: ConversationMessage::class)]
+    #[Groups(['privateMessage:read-message','conversation:read-conversation'])]
+
+    private Collection $conversationMessages;
+
+    #[ORM\ManyToOne(inversedBy: 'conversationCreated')]
+    #[Groups(['privateMessage:read-message','conversation:read-conversation'])]
+    private ?Profile $author = null;
 
     public function __construct()
     {
         $this->profile = new ArrayCollection();
+        $this->conversationMessages = new ArrayCollection();
     }
 
     public function getId(): ?int
     {
         return $this->id;
     }
-
-    public function getContent(): ?string
-    {
-        return $this->content;
-    }
-
-    public function setContent(string $content): static
-    {
-        $this->content = $content;
-
-        return $this;
-    }
-
     /**
      * @return Collection<int, Profile>
      */
@@ -64,6 +62,48 @@ class Conversation
     public function removeProfile(Profile $profile): static
     {
         $this->profile->removeElement($profile);
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, ConversationMessage>
+     */
+    public function getConversationMessages(): Collection
+    {
+        return $this->conversationMessages;
+    }
+
+    public function addConversationMessage(ConversationMessage $conversationMessage): static
+    {
+        if (!$this->conversationMessages->contains($conversationMessage)) {
+            $this->conversationMessages->add($conversationMessage);
+            $conversationMessage->setConversation($this);
+        }
+
+        return $this;
+    }
+
+    public function removeConversationMessage(ConversationMessage $conversationMessage): static
+    {
+        if ($this->conversationMessages->removeElement($conversationMessage)) {
+            // set the owning side to null (unless already changed)
+            if ($conversationMessage->getConversation() === $this) {
+                $conversationMessage->setConversation(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getAuthor(): ?Profile
+    {
+        return $this->author;
+    }
+
+    public function setAuthor(?Profile $author): static
+    {
+        $this->author = $author;
 
         return $this;
     }

@@ -28,6 +28,9 @@ class PrivateMessage
     #[Groups(['privateMessage:read-message'])]
     private ?Profile $recipient = null;
 
+    #[ORM\ManyToOne(inversedBy: 'privateMessages')]
+    private ?Relation $ralationId = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -65,6 +68,18 @@ class PrivateMessage
     public function setRecipient(?Profile $recipient): static
     {
         $this->recipient = $recipient;
+
+        return $this;
+    }
+
+    public function getRalationId(): ?Relation
+    {
+        return $this->ralationId;
+    }
+
+    public function setRalationId(?Relation $ralationId): static
+    {
+        $this->ralationId = $ralationId;
 
         return $this;
     }

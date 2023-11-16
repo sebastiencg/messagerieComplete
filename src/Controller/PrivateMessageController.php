@@ -52,6 +52,7 @@ class PrivateMessageController extends AbstractController
             return $this->json("error",200);
         }
         $message->setAuthor($this->getUser()->getProfile());
+        $message->setRalationId($realation[0]);
         $message->setRecipient($profile);
         $entityManager->persist($message);
         $entityManager->flush();
