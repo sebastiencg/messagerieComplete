@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Repository\InvitationRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: InvitationRepository::class)]
 class Invitation
@@ -11,20 +12,38 @@ class Invitation
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['invitation:read-all'])]
+
     private ?int $id = null;
 
-    #[ORM\OneToOne(inversedBy: 'invitation', cascade: ['persist', 'remove'])]
+    #[ORM\Column]
+    #[Groups(['invitation:read-all'])]
+
+    private ?bool $validity = null;
+
+    #[ORM\ManyToOne(inversedBy: 'invitationGroup')]
+
     private ?Profile $profile = null;
 
-    #[ORM\OneToOne(inversedBy: 'invitation', cascade: ['persist', 'remove'])]
+    #[ORM\ManyToOne(inversedBy: 'invitations')]
+    #[Groups(['invitation:read-all'])]
     private ?Group $ofGroup = null;
-
-    #[ORM\Column]
-    private ?bool $validity = null;
 
     public function getId(): ?int
     {
         return $this->id;
+    }
+
+    public function isValidity(): ?bool
+    {
+        return $this->validity;
+    }
+
+    public function setValidity(bool $validity): static
+    {
+        $this->validity = $validity;
+
+        return $this;
     }
 
     public function getProfile(): ?Profile
@@ -47,18 +66,6 @@ class Invitation
     public function setOfGroup(?Group $ofGroup): static
     {
         $this->ofGroup = $ofGroup;
-
-        return $this;
-    }
-
-    public function isValidity(): ?bool
-    {
-        return $this->validity;
-    }
-
-    public function setValidity(bool $validity): static
-    {
-        $this->validity = $validity;
 
         return $this;
     }

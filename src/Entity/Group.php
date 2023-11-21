@@ -15,7 +15,7 @@ class Group
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['group:read-all'])]
+    #[Groups(['group:read-all','invitation:read-all'])]
 
     private ?int $id = null;
 
@@ -27,22 +27,23 @@ class Group
     #[Groups(['group:read-all'])]
     private ?Profile $author = null;
 
-    #[ORM\ManyToMany(targetEntity: Profile::class, inversedBy: 'groupsAdministrates')]
+    #[ORM\ManyToMany(targetEntity: Profile::class, inversedBy: 'groupsAdministrates',orphanRemoval: true)]
     #[ORM\JoinTable(name:"group_profile_admin")]
     #[Groups(['group:read-all'])]
     private Collection $admin;
 
-    #[ORM\ManyToMany(targetEntity: Profile::class, inversedBy: 'MyGroups')]
+    #[ORM\ManyToMany(targetEntity: Profile::class, inversedBy: 'MyGroups',orphanRemoval: true)]
     #[ORM\JoinTable(name:"group_profile_member")]
     #[Groups(['group:read-all'])]
     private Collection $member;
 
-    #[ORM\OneToMany(mappedBy: 'ofGroup', targetEntity: GroupMessage::class)]
+    #[ORM\OneToMany(mappedBy: 'ofGroup', targetEntity: GroupMessage::class, orphanRemoval: true)]
     #[Groups(['group:read-all'])]
     private Collection $groupMessages;
 
-    #[ORM\OneToOne(mappedBy: 'ofGroup', cascade: ['persist', 'remove'])]
-    private ?Invitation $invitation = null;
+    #[ORM\OneToMany(mappedBy: 'ofGroup', targetEntity: Invitation::class, orphanRemoval: true)]
+    private Collection $invitations;
+
 
 
     public function __construct()
@@ -50,6 +51,7 @@ class Group
         $this->admin = new ArrayCollection();
         $this->member = new ArrayCollection();
         $this->groupMessages = new ArrayCollection();
+        $this->invitations = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -159,26 +161,36 @@ class Group
         return $this;
     }
 
-    public function getInvitation(): ?Invitation
+    /**
+     * @return Collection<int, Invitation>
+     */
+    public function getInvitations(): Collection
     {
-        return $this->invitation;
+        return $this->invitations;
     }
 
-    public function setInvitation(?Invitation $invitation): static
+    public function addInvitation(Invitation $invitation): static
     {
-        // unset the owning side of the relation if necessary
-        if ($invitation === null && $this->invitation !== null) {
-            $this->invitation->setOfGroup(null);
-        }
-
-        // set the owning side of the relation if necessary
-        if ($invitation !== null && $invitation->getOfGroup() !== $this) {
+        if (!$this->invitations->contains($invitation)) {
+            $this->invitations->add($invitation);
             $invitation->setOfGroup($this);
         }
 
-        $this->invitation = $invitation;
+        return $this;
+    }
+
+    public function removeInvitation(Invitation $invitation): static
+    {
+        if ($this->invitations->removeElement($invitation)) {
+            // set the owning side to null (unless already changed)
+            if ($invitation->getOfGroup() === $this) {
+                $invitation->setOfGroup(null);
+            }
+        }
 
         return $this;
     }
+
+
 
 }

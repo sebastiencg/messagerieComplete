@@ -15,11 +15,12 @@ Profile
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['relation:read-one','profile:read-one','profile:read-all','relation:read-onlyRelation','groups'=>'groupe:read-onlyGroupe','privateMessage:read-message','conversation:read-conversation','group:read-all'])]
+    #[Groups(['relation:read-one','profile:read-all','profile:read-one','relation:read-onlyRelation','groups'=>'groupe:read-onlyGroupe','privateMessage:read-message','conversation:read-conversation','group:read-all'])]
     private ?int $id = null;
 
     #[ORM\OneToOne(inversedBy: 'profile', cascade: ['persist', 'remove'])]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['profile:read-all'])]
 
     private ?User $ofUser = null;
 
@@ -29,15 +30,12 @@ Profile
     private ?string $username = null;
 
     #[ORM\OneToMany(mappedBy: 'host', targetEntity: RequestRelation::class)]
-    #[Groups(['profile:read-all'])]
     private Collection $requestRelations;
 
     #[ORM\OneToMany(mappedBy: 'profile1', targetEntity: Relation::class)]
-    #[Groups(['profile:read-all'])]
     private Collection $relationSend;
 
     #[ORM\OneToMany(mappedBy: 'profile2', targetEntity: Relation::class)]
-    #[Groups(['profile:read-all'])]
     private Collection $relationRequest;
 
     #[ORM\Column]
@@ -74,8 +72,9 @@ Profile
     #[ORM\OneToMany(mappedBy: 'author', targetEntity: ResponseMessageGroup::class)]
     private Collection $responseMessageGroups;
 
-    #[ORM\OneToOne(mappedBy: 'profile', cascade: ['persist', 'remove'])]
-    private ?Invitation $invitation = null;
+    #[ORM\OneToMany(mappedBy: 'profile', targetEntity: Invitation::class)]
+    private Collection $invitationGroup;
+
 
 
 
@@ -96,6 +95,7 @@ Profile
         $this->MyGroups = new ArrayCollection();
         $this->groupMessages = new ArrayCollection();
         $this->responseMessageGroups = new ArrayCollection();
+        $this->invitationGroup = new ArrayCollection();
 
 
     }
@@ -522,27 +522,36 @@ Profile
         return $this;
     }
 
-    public function getInvitation(): ?Invitation
+    /**
+     * @return Collection<int, Invitation>
+     */
+    public function getInvitationGroup(): Collection
     {
-        return $this->invitation;
+        return $this->invitationGroup;
     }
 
-    public function setInvitation(?Invitation $invitation): static
+    public function addInvitationGroup(Invitation $invitationGroup): static
     {
-        // unset the owning side of the relation if necessary
-        if ($invitation === null && $this->invitation !== null) {
-            $this->invitation->setProfile(null);
+        if (!$this->invitationGroup->contains($invitationGroup)) {
+            $this->invitationGroup->add($invitationGroup);
+            $invitationGroup->setProfile($this);
         }
-
-        // set the owning side of the relation if necessary
-        if ($invitation !== null && $invitation->getProfile() !== $this) {
-            $invitation->setProfile($this);
-        }
-
-        $this->invitation = $invitation;
 
         return $this;
     }
+
+    public function removeInvitationGroup(Invitation $invitationGroup): static
+    {
+        if ($this->invitationGroup->removeElement($invitationGroup)) {
+            // set the owning side to null (unless already changed)
+            if ($invitationGroup->getProfile() === $this) {
+                $invitationGroup->setProfile(null);
+            }
+        }
+
+        return $this;
+    }
+
 
 
 

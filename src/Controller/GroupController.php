@@ -36,12 +36,12 @@ class GroupController extends AbstractController
         return $this->json($group,200,[],['groups'=>'group:read-all']);
     }
 
-    #[Route('/{id}/member/delete', name: 'app_group_member_delete', methods: ['DELETE'])]
-    public function deleteMember(Request $request,ProfileRepository $profileRepository, EntityManagerInterface $entityManager,SerializerInterface $serializer,Group $group): Response
+    #[Route('/{id}/member/exclude', name: 'app_group_member_exclude', methods: ['DELETE'])]
+    public function excludeMember(Request $request,ProfileRepository $profileRepository, EntityManagerInterface $entityManager,SerializerInterface $serializer,Group $group): Response
     {
         $json = $request->getContent();
-        $profile = $serializer->deserialize($json,Profile::class,'json');
-        $profile=$profileRepository->findOneBy(["username"=>$profile->getUsername()]);
+        $data = json_decode($json, true);
+        $profile=$profileRepository->findOneBy(["id"=>$data["id"]]);
         if (!$profile){
             return $this->json('profile no find');
         }
@@ -52,18 +52,24 @@ class GroupController extends AbstractController
             return $this->json('you are no admin');
 
         }
+        $groupInvitations=$group->getInvitations()->getValues();
+        foreach ($groupInvitations as  $groupInvitation){
+            if ($groupInvitation->getProfile() === $profile){
+               $entityManager->remove($groupInvitation);
+            }
+        }
         $group->removeMember($profile);
         $entityManager->persist($group);
         $entityManager->flush();
-        return $this->json('member sup');
+        return $this->json('member exclude');
     }
 
     #[Route('/{id}/member/promote', name: 'app_group_member_promote', methods: ['POST'])]
     public function promoteMember(Request $request,ProfileRepository $profileRepository, EntityManagerInterface $entityManager,SerializerInterface $serializer,Group $group): Response
     {
         $json = $request->getContent();
-        $profile = $serializer->deserialize($json,Profile::class,'json');
-        $profile=$profileRepository->findOneBy(["username"=>$profile->getUsername()]);
+        $data = json_decode($json, true);
+        $profile=$profileRepository->findOneBy(["id"=>$data["id"]]);
         if (!$profile){
             return $this->json('profile no find');
         }
@@ -78,6 +84,27 @@ class GroupController extends AbstractController
         $entityManager->persist($group);
         $entityManager->flush();
         return $this->json('member promote');
+    }
+    #[Route('/{id}/member/demote', name: 'app_group_member_demote', methods: ['POST'])]
+    public function demoteMember(Request $request,ProfileRepository $profileRepository, EntityManagerInterface $entityManager,SerializerInterface $serializer,Group $group): Response
+    {
+        $json = $request->getContent();
+        $data = json_decode($json, true);
+        $profile=$profileRepository->findOneBy(["id"=>$data["id"]]);
+        if (!$profile){
+            return $this->json('profile no find');
+        }
+        if (!in_array($profile,$group->getMember()->getValues())){
+            return $this->json('$profile no member');
+        }
+        if (!in_array($this->getUser()->getProfile(),$group->getAdmin()->getValues())){
+            return $this->json('you are no admin');
+
+        }
+        $group->removeAdmin($profile);
+        $entityManager->persist($group);
+        $entityManager->flush();
+        return $this->json('member demote');
     }
 
     #[Route('/{id}', name: 'app_group_show', methods: ['GET'])]

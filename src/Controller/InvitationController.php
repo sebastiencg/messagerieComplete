@@ -23,7 +23,7 @@ class InvitationController extends AbstractController
     public function index( ): Response
     {
 
-        return $this->json($this->getUser()->getProfile()->getInvitation(),200,[],['groups'=>'invitation:read-all']);
+        return $this->json($this->getUser()->getProfile()->getInvitationGroup()->getValues(),200,[],['groups'=>'invitation:read-all']);
     }
 
     #[Route('/create/group/{id}/', name: 'app_invitation_create', methods: ['POST'])]
@@ -36,30 +36,32 @@ class InvitationController extends AbstractController
         if (!in_array($this->getUser()->getProfile(),$group->getAdmin()->getValues())){
             return $this->json('your are no admin');
         }
-
         $json = $request->getContent();
-        $profile = $serializer->deserialize($json,Profile::class,'json');
-        $profile=$profileRepository->findOneBy(["username"=>$profile->getUsername()]);
+        $datas = json_decode($json, true);
+        foreach ($datas as $data) {
+            $profileId=$data["profile"];
+            $profile=$profileRepository->findOneBy(["id"=>$profileId]);
+            if(!$profile){
+                return $this->json("error de ID");
+            }
+            $groupInvitations=$group->getInvitations()->getValues();
+            foreach ($groupInvitations as  $groupInvitation){
+                if ($groupInvitation->getProfile() === $profile){
+                    return $this->json('invitation already exists');
+                }
+            }
+            $invitation = new Invitation();
+            $invitation->setProfile($profile);
+            $invitation->setOfGroup($group);
+            $invitation->setValidity(false);
+            $entityManager->persist($invitation);
 
-        if(!$profile){
-            return $this->json('error');
         }
-
-        if($invitationRepository->findBy(["profile"=>$profile,"ofGroup"=>$group])){
-            return $this->json('invitation already exists');
-
-        }
-
-        $invitation = new Invitation();
-        $invitation->setProfile($profile);
-        $invitation->setOfGroup($group);
-        $invitation->setValidity(false);
-        $entityManager->persist($invitation);
         $entityManager->flush();
         return $this->json('invitation send ');
     }
 
-    #[Route('/{id}/denied', name: 'app_invitation_denied', methods: ['GET'])]
+    #[Route('/{id}/denied', name: 'app_invitation_denied', methods: ['DELETE'])]
     public function denied(Invitation $invitation,EntityManagerInterface $entityManager): Response
     {
         if (!$invitation){
