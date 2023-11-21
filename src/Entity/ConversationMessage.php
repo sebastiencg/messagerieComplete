@@ -13,17 +13,21 @@ class ConversationMessage
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['privateMessage:read-message'])]
+
     private ?int $id = null;
 
     #[ORM\Column(type: Types::TEXT)]
     #[Groups(['privateMessage:read-message'])]
+
     private ?string $content = null;
 
     #[ORM\ManyToOne(inversedBy: 'conversationMessages')]
-    #[Groups(['privateMessage:read-message'])]
     private ?Conversation $conversation = null;
 
     #[ORM\ManyToOne(inversedBy: 'conversationMessages')]
+    #[Groups(['privateMessage:read-message'])]
+
     private ?Profile $author = null;
 
     public function getId(): ?int

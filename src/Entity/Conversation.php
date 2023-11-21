@@ -20,10 +20,11 @@ class Conversation
     private ?int $id = null;
 
     #[ORM\ManyToMany(targetEntity: Profile::class, inversedBy: 'conversations')]
-    #[Groups(['privateMessage:read-message','conversation:read-conversation'])]
+    #[Groups(['conversation:read-conversation'])]
+
     private Collection $profile;
 
-    #[ORM\OneToMany(mappedBy: 'conversation', targetEntity: ConversationMessage::class)]
+    #[ORM\OneToMany(mappedBy: 'conversation', targetEntity: ConversationMessage::class ,orphanRemoval: true)]
     #[Groups(['privateMessage:read-message','conversation:read-conversation'])]
 
     private Collection $conversationMessages;

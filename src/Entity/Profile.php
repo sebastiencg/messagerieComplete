@@ -15,7 +15,7 @@ Profile
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['relation:read-one','profile:read-one','profile:read-all','relation:read-onlyRelation','groups'=>'groupe:read-onlyGroupe','privateMessage:read-message'])]
+    #[Groups(['relation:read-one','profile:read-one','profile:read-all','relation:read-onlyRelation','groups'=>'groupe:read-onlyGroupe','privateMessage:read-message','conversation:read-conversation','group:read-all'])]
     private ?int $id = null;
 
     #[ORM\OneToOne(inversedBy: 'profile', cascade: ['persist', 'remove'])]
@@ -24,7 +24,7 @@ Profile
     private ?User $ofUser = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['relation:read-one','profile:read-one','profile:read-all','relation:read-onlyRelation','groups'=>'groupe:read-onlyGroupe','privateMessage:read-message'])]
+    #[Groups(['relation:read-one','profile:read-one','profile:read-all','relation:read-onlyRelation','groups'=>'groupe:read-onlyGroupe','privateMessage:read-message','conversation:read-conversation','group:read-all'])]
 
     private ?string $username = null;
 
@@ -59,6 +59,24 @@ Profile
     #[ORM\OneToMany(mappedBy: 'author', targetEntity: ConversationMessage::class)]
     private Collection $conversationMessages;
 
+    #[ORM\OneToMany(mappedBy: 'author', targetEntity: Group::class)]
+    private Collection $groupsCreate;
+
+    #[ORM\ManyToMany(targetEntity: Group::class, mappedBy: 'admin')]
+    private Collection $groupsAdministrates;
+
+    #[ORM\ManyToMany(targetEntity: Group::class, mappedBy: 'member')]
+    private Collection $MyGroups;
+
+    #[ORM\OneToMany(mappedBy: 'author', targetEntity: GroupMessage::class)]
+    private Collection $groupMessages;
+
+    #[ORM\OneToMany(mappedBy: 'author', targetEntity: ResponseMessageGroup::class)]
+    private Collection $responseMessageGroups;
+
+    #[ORM\OneToOne(mappedBy: 'profile', cascade: ['persist', 'remove'])]
+    private ?Invitation $invitation = null;
+
 
 
 
@@ -73,6 +91,11 @@ Profile
         $this->conversations = new ArrayCollection();
         $this->conversationCreated = new ArrayCollection();
         $this->conversationMessages = new ArrayCollection();
+        $this->groupsCreate = new ArrayCollection();
+        $this->groupsAdministrates = new ArrayCollection();
+        $this->MyGroups = new ArrayCollection();
+        $this->groupMessages = new ArrayCollection();
+        $this->responseMessageGroups = new ArrayCollection();
 
 
     }
@@ -351,6 +374,172 @@ Profile
                 $conversationMessage->setAuthor(null);
             }
         }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Group>
+     */
+    public function getGroupsCreate(): Collection
+    {
+        return $this->groupsCreate;
+    }
+
+    public function addGroupsCreate(Group $groupsCreate): static
+    {
+        if (!$this->groupsCreate->contains($groupsCreate)) {
+            $this->groupsCreate->add($groupsCreate);
+            $groupsCreate->setAuthor($this);
+        }
+
+        return $this;
+    }
+
+    public function removeGroupsCreate(Group $groupsCreate): static
+    {
+        if ($this->groupsCreate->removeElement($groupsCreate)) {
+            // set the owning side to null (unless already changed)
+            if ($groupsCreate->getAuthor() === $this) {
+                $groupsCreate->setAuthor(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Group>
+     */
+    public function getGroupsAdministrates(): Collection
+    {
+        return $this->groupsAdministrates;
+    }
+
+    public function addGroupsAdministrate(Group $groupsAdministrate): static
+    {
+        if (!$this->groupsAdministrates->contains($groupsAdministrate)) {
+            $this->groupsAdministrates->add($groupsAdministrate);
+            $groupsAdministrate->addAdmin($this);
+        }
+
+        return $this;
+    }
+
+    public function removeGroupsAdministrate(Group $groupsAdministrate): static
+    {
+        if ($this->groupsAdministrates->removeElement($groupsAdministrate)) {
+            $groupsAdministrate->removeAdmin($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Group>
+     */
+    public function getMyGroups(): Collection
+    {
+        return $this->MyGroups;
+    }
+
+    public function addMyGroup(Group $myGroup): static
+    {
+        if (!$this->MyGroups->contains($myGroup)) {
+            $this->MyGroups->add($myGroup);
+            $myGroup->addMember($this);
+        }
+
+        return $this;
+    }
+
+    public function removeMyGroup(Group $myGroup): static
+    {
+        if ($this->MyGroups->removeElement($myGroup)) {
+            $myGroup->removeMember($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, GroupMessage>
+     */
+    public function getGroupMessages(): Collection
+    {
+        return $this->groupMessages;
+    }
+
+    public function addGroupMessage(GroupMessage $groupMessage): static
+    {
+        if (!$this->groupMessages->contains($groupMessage)) {
+            $this->groupMessages->add($groupMessage);
+            $groupMessage->setAuthor($this);
+        }
+
+        return $this;
+    }
+
+    public function removeGroupMessage(GroupMessage $groupMessage): static
+    {
+        if ($this->groupMessages->removeElement($groupMessage)) {
+            // set the owning side to null (unless already changed)
+            if ($groupMessage->getAuthor() === $this) {
+                $groupMessage->setAuthor(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, ResponseMessageGroup>
+     */
+    public function getResponseMessageGroups(): Collection
+    {
+        return $this->responseMessageGroups;
+    }
+
+    public function addResponseMessageGroup(ResponseMessageGroup $responseMessageGroup): static
+    {
+        if (!$this->responseMessageGroups->contains($responseMessageGroup)) {
+            $this->responseMessageGroups->add($responseMessageGroup);
+            $responseMessageGroup->setAuthor($this);
+        }
+
+        return $this;
+    }
+
+    public function removeResponseMessageGroup(ResponseMessageGroup $responseMessageGroup): static
+    {
+        if ($this->responseMessageGroups->removeElement($responseMessageGroup)) {
+            // set the owning side to null (unless already changed)
+            if ($responseMessageGroup->getAuthor() === $this) {
+                $responseMessageGroup->setAuthor(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getInvitation(): ?Invitation
+    {
+        return $this->invitation;
+    }
+
+    public function setInvitation(?Invitation $invitation): static
+    {
+        // unset the owning side of the relation if necessary
+        if ($invitation === null && $this->invitation !== null) {
+            $this->invitation->setProfile(null);
+        }
+
+        // set the owning side of the relation if necessary
+        if ($invitation !== null && $invitation->getProfile() !== $this) {
+            $invitation->setProfile($this);
+        }
+
+        $this->invitation = $invitation;
 
         return $this;
     }
