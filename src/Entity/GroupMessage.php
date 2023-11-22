@@ -7,6 +7,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: GroupMessageRepository::class)]
 class GroupMessage
@@ -14,21 +15,29 @@ class GroupMessage
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['GroupMessage:read-message'])]
     private ?int $id = null;
 
     #[ORM\Column(type: Types::TEXT)]
+    #[Groups(['GroupMessage:read-message'])]
     private ?string $content = null;
 
     #[ORM\ManyToOne(inversedBy: 'groupMessages')]
+    #[Groups(['GroupMessage:read-message'])]
+
     private ?Profile $author = null;
 
     #[ORM\ManyToOne(inversedBy: 'groupMessages')]
+    #[Groups(['GroupMessage:read-message'])]
+
     private ?Group $ofGroup = null;
 
     #[ORM\Column]
+    #[Groups(['GroupMessage:read-message'])]
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\OneToMany(mappedBy: 'ofGroupMessage', targetEntity: ResponseMessageGroup::class)]
+    #[Groups(['GroupMessage:read-message'])]
     private Collection $responseMessageGroups;
 
     public function __construct()

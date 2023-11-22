@@ -15,12 +15,12 @@ class Group
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['group:read-all','invitation:read-all'])]
+    #[Groups(['group:read-all','invitation:read-all','GroupMessage:read-message'])]
 
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['group:read-all'])]
+    #[Groups(['group:read-all','GroupMessage:read-message'])]
     private ?string $name = null;
 
     #[ORM\ManyToOne(inversedBy: 'groupsCreate')]
@@ -38,7 +38,8 @@ class Group
     private Collection $member;
 
     #[ORM\OneToMany(mappedBy: 'ofGroup', targetEntity: GroupMessage::class, orphanRemoval: true)]
-    #[Groups(['group:read-all'])]
+    #[Groups(['group:read-all',])]
+
     private Collection $groupMessages;
 
     #[ORM\OneToMany(mappedBy: 'ofGroup', targetEntity: Invitation::class, orphanRemoval: true)]
