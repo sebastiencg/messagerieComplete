@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Repository\ResponseMessageGroupRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: ResponseMessageGroupRepository::class)]
 class ResponseMessageGroup
@@ -12,15 +13,20 @@ class ResponseMessageGroup
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['responseMessage:read-response','responseMessage:all-response'])]
+
     private ?int $id = null;
 
     #[ORM\Column(type: Types::TEXT)]
+    #[Groups(['responseMessage:read-response','responseMessage:all-response'])]
     private ?string $content = null;
 
     #[ORM\ManyToOne(inversedBy: 'responseMessageGroups')]
+    #[Groups(['responseMessage:read-response','responseMessage:all-response'])]
     private ?Profile $author = null;
 
     #[ORM\ManyToOne(inversedBy: 'responseMessageGroups')]
+    #[Groups(['responseMessage:read-response'])]
     private ?GroupMessage $ofGroupMessage = null;
 
     public function getId(): ?int

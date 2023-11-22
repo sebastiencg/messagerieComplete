@@ -15,7 +15,7 @@ Profile
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['relation:read-one','profile:read-all','profile:read-one','relation:read-onlyRelation','groups'=>'groupe:read-onlyGroupe','privateMessage:read-message','conversation:read-conversation','group:read-all','GroupMessage:read-message'])]
+    #[Groups(['relation:read-one','profile:read-all','profile:read-one','relation:read-onlyRelation','groups'=>'groupe:read-onlyGroupe','privateMessage:read-message','conversation:read-conversation','group:read-all','GroupMessage:read-message','responseMessage:read-response','responseMessage:all-response'])]
     private ?int $id = null;
 
     #[ORM\OneToOne(inversedBy: 'profile', cascade: ['persist', 'remove'])]
@@ -25,7 +25,7 @@ Profile
     private ?User $ofUser = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['relation:read-one','profile:read-one','profile:read-all','relation:read-onlyRelation','groups'=>'groupe:read-onlyGroupe','privateMessage:read-message','conversation:read-conversation','group:read-all','GroupMessage:read-message'])]
+    #[Groups(['relation:read-one','profile:read-one','profile:read-all','relation:read-onlyRelation','groups'=>'groupe:read-onlyGroupe','privateMessage:read-message','conversation:read-conversation','group:read-all','GroupMessage:read-message','responseMessage:read-response','responseMessage:all-response'])]
 
     private ?string $username = null;
 

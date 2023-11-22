@@ -15,11 +15,11 @@ class GroupMessage
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['GroupMessage:read-message'])]
+    #[Groups(['GroupMessage:read-message','responseMessage:read-response','responseMessage:all-response'])]
     private ?int $id = null;
 
     #[ORM\Column(type: Types::TEXT)]
-    #[Groups(['GroupMessage:read-message'])]
+    #[Groups(['GroupMessage:read-message','responseMessage:read-response','responseMessage:all-response'])]
     private ?string $content = null;
 
     #[ORM\ManyToOne(inversedBy: 'groupMessages')]
@@ -36,8 +36,8 @@ class GroupMessage
     #[Groups(['GroupMessage:read-message'])]
     private ?\DateTimeImmutable $createdAt = null;
 
-    #[ORM\OneToMany(mappedBy: 'ofGroupMessage', targetEntity: ResponseMessageGroup::class)]
-    #[Groups(['GroupMessage:read-message'])]
+    #[ORM\OneToMany(mappedBy: 'ofGroupMessage', targetEntity: ResponseMessageGroup::class ,orphanRemoval: true)]
+    #[Groups(['GroupMessage:read-message','responseMessage:all-response'])]
     private Collection $responseMessageGroups;
 
     public function __construct()

@@ -4,7 +4,6 @@ namespace App\Controller;
 
 use App\Entity\Conversation;
 use App\Entity\ConversationMessage;
-use App\Entity\Profile;
 use App\Repository\ConversationMessageRepository;
 use App\Repository\ProfileRepository;
 use App\Repository\RelationRepository;
