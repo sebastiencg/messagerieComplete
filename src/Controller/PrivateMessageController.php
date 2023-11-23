@@ -4,8 +4,10 @@ namespace App\Controller;
 
 use App\Entity\PrivateMessage;
 use App\Entity\Profile;
+use App\Repository\ImageRepository;
 use App\Repository\PrivateMessageRepository;
 use App\Repository\RelationRepository;
+use App\Service\PostprocessorImage;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -29,10 +31,11 @@ class PrivateMessageController extends AbstractController
         return $this->json("error",200);
     }
     #[Route('/{id}', name: 'app_message_show', methods: ['GET'])]
-    public function show(PrivateMessage $privateMessage): Response
+    public function show(PrivateMessage $privateMessage,PostprocessorImage $postprocessorImage): Response
     {
 
         if ($privateMessage->getAuthor()==$this->getUser()->getProfile()){
+            $privateMessage=$postprocessorImage->getImagesUrlFromImages($privateMessage);
             return $this->json($privateMessage,200,[],['groups'=>'privateMessage:read-message']);
 
         }
@@ -40,7 +43,7 @@ class PrivateMessageController extends AbstractController
 
     }
     #[Route('/create/{id}', name: 'app_message_create', methods: ['POST'])]
-    public function create(Profile $profile , Request $request,SerializerInterface $serializer ,EntityManagerInterface $entityManager,RelationRepository $relationRepository): Response
+    public function create(Profile $profile , Request $request,SerializerInterface $serializer ,EntityManagerInterface $entityManager,RelationRepository $relationRepository ,PostprocessorImage $postprocessorImage): Response
     {
         $realation=$relationRepository->relationCustom2($this->getUser()->getProfile()->getId());
         if (!$realation){
@@ -50,6 +53,12 @@ class PrivateMessageController extends AbstractController
         $message = $serializer->deserialize($json,PrivateMessage::class,'json');
         if($message->getContent()==null){
             return $this->json("error",200);
+        }
+        $images = $postprocessorImage->findImageById($message->getAssociatedImages());
+        if ($images){
+            foreach ($images as $image){
+                $message->addImage($image);
+            }
         }
         $message->setAuthor($this->getUser()->getProfile());
         $message->setRalationId($realation[0]);

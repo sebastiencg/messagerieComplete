@@ -75,6 +75,9 @@ Profile
     #[ORM\OneToMany(mappedBy: 'profile', targetEntity: Invitation::class)]
     private Collection $invitationGroup;
 
+    #[ORM\OneToMany(mappedBy: 'author', targetEntity: Image::class)]
+    private Collection $myPrivateMessageImages;
+
 
 
 
@@ -96,6 +99,7 @@ Profile
         $this->groupMessages = new ArrayCollection();
         $this->responseMessageGroups = new ArrayCollection();
         $this->invitationGroup = new ArrayCollection();
+        $this->myPrivateMessageImages = new ArrayCollection();
 
 
     }
@@ -546,6 +550,36 @@ Profile
             // set the owning side to null (unless already changed)
             if ($invitationGroup->getProfile() === $this) {
                 $invitationGroup->setProfile(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Image>
+     */
+    public function getMyPrivateMessageImages(): Collection
+    {
+        return $this->myPrivateMessageImages;
+    }
+
+    public function addMyPrivateMessageImage(Image $myPrivateMessageImage): static
+    {
+        if (!$this->myPrivateMessageImages->contains($myPrivateMessageImage)) {
+            $this->myPrivateMessageImages->add($myPrivateMessageImage);
+            $myPrivateMessageImage->setAuthor($this);
+        }
+
+        return $this;
+    }
+
+    public function removeMyPrivateMessageImage(Image $myPrivateMessageImage): static
+    {
+        if ($this->myPrivateMessageImages->removeElement($myPrivateMessageImage)) {
+            // set the owning side to null (unless already changed)
+            if ($myPrivateMessageImage->getAuthor() === $this) {
+                $myPrivateMessageImage->setAuthor(null);
             }
         }
 
