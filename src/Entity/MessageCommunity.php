@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Repository\MessageCommunityRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: MessageCommunityRepository::class)]
 class MessageCommunity
@@ -12,15 +13,20 @@ class MessageCommunity
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['communityMessage:read-message'])]
+
     private ?int $id = null;
 
     #[ORM\Column(type: Types::TEXT)]
+    #[Groups(['communityMessage:read-message'])]
     private ?string $content = null;
 
     #[ORM\ManyToOne(inversedBy: 'messageCommunities')]
+    #[Groups(['communityMessage:read-message'])]
     private ?Profile $author = null;
 
     #[ORM\ManyToOne(inversedBy: 'messageCommunities')]
+    #[Groups(['communityMessage:read-message'])]
     private ?Community $community = null;
 
     public function getId(): ?int

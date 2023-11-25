@@ -6,6 +6,7 @@ use App\Repository\CommunityRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: CommunityRepository::class)]
 class Community
@@ -13,15 +14,19 @@ class Community
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['community:read-all','communityMessage:read-message'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['community:read-all','communityMessage:read-message'])]
     private ?string $name = null;
 
     #[ORM\ManyToOne(inversedBy: 'authorCommunities')]
+    #[Groups(['community:read-all'])]
     private ?Profile $author = null;
 
     #[ORM\ManyToMany(targetEntity: Profile::class, inversedBy: 'myCommunities')]
+    #[Groups(['community:read-all'])]
     private Collection $member;
 
     #[ORM\OneToMany(mappedBy: 'community', targetEntity: MessageCommunity::class)]
