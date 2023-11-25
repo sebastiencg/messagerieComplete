@@ -8,6 +8,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Annotation\SerializedName;
 
 #[ORM\Entity(repositoryClass: GroupMessageRepository::class)]
 class GroupMessage
@@ -40,9 +41,18 @@ class GroupMessage
     #[Groups(['GroupMessage:read-message','responseMessage:all-response'])]
     private Collection $responseMessageGroups;
 
+    #[ORM\OneToMany(mappedBy: 'groupMessage', targetEntity: Image::class)]
+    private Collection $images;
+    private ?array $associatedImages = null;
+
+    #[SerializedName(serializedName: 'images')]
+    #[Groups(['privateMessage:read-message'])]
+    private ArrayCollection $imagesUrls;
+
     public function __construct()
     {
         $this->responseMessageGroups = new ArrayCollection();
+        $this->images = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -124,6 +134,58 @@ class GroupMessage
                 $responseMessageGroup->setOfGroupMessage(null);
             }
         }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Image>
+     */
+    public function getImages(): Collection
+    {
+        return $this->images;
+    }
+
+    public function addImage(Image $image): static
+    {
+        if (!$this->images->contains($image)) {
+            $this->images->add($image);
+            $image->setGroupMessage($this);
+        }
+
+        return $this;
+    }
+
+    public function removeImage(Image $image): static
+    {
+        if ($this->images->removeElement($image)) {
+            // set the owning side to null (unless already changed)
+            if ($image->getGroupMessage() === $this) {
+                $image->setGroupMessage(null);
+            }
+        }
+
+        return $this;
+    }
+    public function getAssociatedImages(): ?array
+    {
+        return $this->associatedImages;
+    }
+
+    public function setAssociatedImages(?array $image): static
+    {
+        $this->associatedImages = $image;
+
+        return $this;
+    }
+    public function getImagesUrls(): ArrayCollection
+    {
+        return $this->imagesUrls;
+    }
+
+    public function setImagesUrls($image): static
+    {
+        $this->imagesUrls = $image;
 
         return $this;
     }

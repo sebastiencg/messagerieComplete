@@ -78,6 +78,15 @@ Profile
     #[ORM\OneToMany(mappedBy: 'author', targetEntity: Image::class)]
     private Collection $myPrivateMessageImages;
 
+    #[ORM\OneToMany(mappedBy: 'author', targetEntity: Community::class)]
+    private Collection $authorCommunities;
+
+    #[ORM\ManyToMany(targetEntity: Community::class, mappedBy: 'member')]
+    private Collection $myCommunities;
+
+    #[ORM\OneToMany(mappedBy: 'author', targetEntity: MessageCommunity::class)]
+    private Collection $messageCommunities;
+
 
 
 
@@ -100,6 +109,9 @@ Profile
         $this->responseMessageGroups = new ArrayCollection();
         $this->invitationGroup = new ArrayCollection();
         $this->myPrivateMessageImages = new ArrayCollection();
+        $this->authorCommunities = new ArrayCollection();
+        $this->myCommunities = new ArrayCollection();
+        $this->messageCommunities = new ArrayCollection();
 
 
     }
@@ -580,6 +592,93 @@ Profile
             // set the owning side to null (unless already changed)
             if ($myPrivateMessageImage->getAuthor() === $this) {
                 $myPrivateMessageImage->setAuthor(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Community>
+     */
+    public function getAuthorCommunities(): Collection
+    {
+        return $this->authorCommunities;
+    }
+
+    public function addAuthorCommunity(Community $authorCommunity): static
+    {
+        if (!$this->authorCommunities->contains($authorCommunity)) {
+            $this->authorCommunities->add($authorCommunity);
+            $authorCommunity->setAuthor($this);
+        }
+
+        return $this;
+    }
+
+    public function removeAuthorCommunity(Community $authorCommunity): static
+    {
+        if ($this->authorCommunities->removeElement($authorCommunity)) {
+            // set the owning side to null (unless already changed)
+            if ($authorCommunity->getAuthor() === $this) {
+                $authorCommunity->setAuthor(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Community>
+     */
+    public function getMyCommunities(): Collection
+    {
+        return $this->myCommunities;
+    }
+
+    public function addMyCommunity(Community $myCommunity): static
+    {
+        if (!$this->myCommunities->contains($myCommunity)) {
+            $this->myCommunities->add($myCommunity);
+            $myCommunity->addMember($this);
+        }
+
+        return $this;
+    }
+
+    public function removeMyCommunity(Community $myCommunity): static
+    {
+        if ($this->myCommunities->removeElement($myCommunity)) {
+            $myCommunity->removeMember($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, MessageCommunity>
+     */
+    public function getMessageCommunities(): Collection
+    {
+        return $this->messageCommunities;
+    }
+
+    public function addMessageCommunity(MessageCommunity $messageCommunity): static
+    {
+        if (!$this->messageCommunities->contains($messageCommunity)) {
+            $this->messageCommunities->add($messageCommunity);
+            $messageCommunity->setAuthor($this);
+        }
+
+        return $this;
+    }
+
+    public function removeMessageCommunity(MessageCommunity $messageCommunity): static
+    {
+        if ($this->messageCommunities->removeElement($messageCommunity)) {
+            // set the owning side to null (unless already changed)
+            if ($messageCommunity->getAuthor() === $this) {
+                $messageCommunity->setAuthor(null);
             }
         }
 

@@ -38,6 +38,12 @@ class Image
     #[ORM\ManyToOne(inversedBy: 'myPrivateMessageImages')]
     private ?Profile $author = null;
 
+    #[ORM\ManyToOne(inversedBy: 'images')]
+    private ?ConversationMessage $conversationMessage = null;
+
+    #[ORM\ManyToOne(inversedBy: 'images')]
+    private ?GroupMessage $groupMessage = null;
+
     /**
      * If manually uploading a file (i.e. not using Symfony Form) ensure an instance
      * of 'UploadedFile' is injected into this setter to trigger the update. If this
@@ -103,6 +109,30 @@ class Image
     public function setAuthor(?Profile $author): static
     {
         $this->author = $author;
+
+        return $this;
+    }
+
+    public function getConversationMessage(): ?ConversationMessage
+    {
+        return $this->conversationMessage;
+    }
+
+    public function setConversationMessage(?ConversationMessage $conversationMessage): static
+    {
+        $this->conversationMessage = $conversationMessage;
+
+        return $this;
+    }
+
+    public function getGroupMessage(): ?GroupMessage
+    {
+        return $this->groupMessage;
+    }
+
+    public function setGroupMessage(?GroupMessage $groupMessage): static
+    {
+        $this->groupMessage = $groupMessage;
 
         return $this;
     }

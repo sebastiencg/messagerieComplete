@@ -54,10 +54,12 @@ class PrivateMessageController extends AbstractController
         if($message->getContent()==null){
             return $this->json("error",200);
         }
-        $images = $postprocessorImage->findImageById($message->getAssociatedImages());
-        if ($images){
-            foreach ($images as $image){
-                $message->addImage($image);
+        if(!$message->getAssociatedImages()==null) {
+            $images = $postprocessorImage->findImageById($message->getAssociatedImages());
+            if ($images){
+                foreach ($images as $image){
+                    $message->addImage($image);
+                }
             }
         }
         $message->setAuthor($this->getUser()->getProfile());
@@ -65,6 +67,7 @@ class PrivateMessageController extends AbstractController
         $message->setRecipient($profile);
         $entityManager->persist($message);
         $entityManager->flush();
+        $message=$postprocessorImage->getImagesUrlFromPrivateMessage($message);
 
         return $this->json($message,200,[],['groups'=>'privateMessage:read-message']);
     }

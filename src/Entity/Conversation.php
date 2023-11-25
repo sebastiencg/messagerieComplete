@@ -20,7 +20,7 @@ class Conversation
     private ?int $id = null;
 
     #[ORM\ManyToMany(targetEntity: Profile::class, inversedBy: 'conversations')]
-    #[Groups(['conversation:read-conversation'])]
+    #[Groups(['conversation:read-conversation','privateMessage:read-message',])]
 
     private Collection $profile;
 

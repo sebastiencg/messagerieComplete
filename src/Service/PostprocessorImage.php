@@ -2,6 +2,7 @@
 
 namespace App\Service;
 
+use App\Entity\ConversationMessage;
 use App\Entity\PrivateMessage;
 use App\Entity\User;
 use App\Repository\ImageRepository;
@@ -43,7 +44,7 @@ class PostprocessorImage
         return $images;
 
     }
-    public function getImagesUrlFromImages(PrivateMessage $privateMessage): PrivateMessage
+    public function getImagesUrlFromPrivateMessage(PrivateMessage $privateMessage): PrivateMessage
     {
 
         $imageUrls = new ArrayCollection();
@@ -59,6 +60,23 @@ class PostprocessorImage
         $privateMessage->setImagesUrls($imageUrls);
 
         return $privateMessage;
+    }
+    public function getImagesUrlFromConversationMessage(ConversationMessage $conversationMessage): ConversationMessage
+    {
+
+        $imageUrls = new ArrayCollection();
+
+
+        foreach ($conversationMessage->getImages() as $image) {
+            $imageFind = $this->imageRepository->find($image);
+            if ($imageFind){
+                $newImageURL = ["id"=>$imageFind->getId(), "url"=>$this->cacheManager->getBrowserPath($this->uploaderHelper->asset($imageFind),"my_thumb")];
+                $imageUrls->add($newImageURL);
+            }
+        }
+        $conversationMessage->setImagesUrls($imageUrls);
+
+        return $conversationMessage;
     }
 
 }

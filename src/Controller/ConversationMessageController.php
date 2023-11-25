@@ -7,6 +7,8 @@ use App\Entity\ConversationMessage;
 use App\Repository\ConversationMessageRepository;
 use App\Repository\ProfileRepository;
 use App\Repository\RelationRepository;
+use App\Service\PostprocessorImage;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -28,7 +30,7 @@ class ConversationMessageController extends AbstractController
         $entityManager->flush();
         return $this->json($conversation,200,[],['groups'=>'privateMessage:read-message']);
     }
-    #[Route('/delete/{id}', name: 'app_conversation_delete',methods: ['DELETE'])]
+    #[Route('/{id}/delete/', name: 'app_conversation_delete',methods: ['DELETE'])]
     public function delete(Conversation $conversation,EntityManagerInterface $entityManager): Response
     {
         if ($conversation->getAuthor()!==$this->getUser()->getProfile()){
@@ -39,15 +41,36 @@ class ConversationMessageController extends AbstractController
         $entityManager->flush();
         return $this->json("conversation delete");
     }
-    #[Route('/{id}/messages', name: 'app_conversation_message_index', methods: ['GET'])]
-    public function indexMessage(Conversation $conversation,): Response
+    #[Route('/{id}/message/create', name: 'app_conversation_createMessage', methods: ['POST'])]
+    public function createMessage(Conversation $conversation,Request $request, SerializerInterface $serializer, EntityManagerInterface $entityManager,PostprocessorImage $postprocessorImage): Response
     {
-        if (in_array($this->getUser()->getProfile(), $conversation->getProfile()->getValues())) {
+        if (!in_array($this->getUser()->getProfile(), $conversation->getProfile()->getValues())) {
             return $this->json($conversation->getConversationMessages()->getValues(),200,[],['groups'=>'privateMessage:read-message']);
         }
-        return $this->json('error tu ne fais pas parti du groupe ');
-    }
 
+        $json = $request->getContent();
+        $message = $serializer->deserialize($json,ConversationMessage::class,'json');
+
+        if($message->getContent()==null){
+            return $this->json("error",200);
+        }
+        if(!$message->getAssociatedImages()==null) {
+            $images = $postprocessorImage->findImageById($message->getAssociatedImages());
+            if ($images){
+                foreach ($images as $image){
+                    $message->addImage($image);
+                }
+            }
+        }
+
+        $message->setAuthor($this->getUser()->getProfile());
+        $message->setConversation($conversation);
+        $entityManager->persist($message);
+        $entityManager->flush();
+        $message=$postprocessorImage->getImagesUrlFromConversationMessage($message);
+        return $this->json($message,200,[],['groups'=>'privateMessage:read-message']);
+
+    }
     #[Route('/{id}/message/delete', name: 'app_conversation_message_delete', methods: ['DELETE'])]
     public function deleteMessage(Conversation $conversation,Request $request, ConversationMessageRepository $messageRepository, EntityManagerInterface $entityManager): Response
     {
@@ -69,26 +92,6 @@ class ConversationMessageController extends AbstractController
         }
         $entityManager->flush();
         return $this->json('message delete ');
-    }
-    #[Route('/{id}/message/create', name: 'app_conversation_createMessage', methods: ['POST'])]
-    public function createMessage(Conversation $conversation,Request $request, SerializerInterface $serializer, EntityManagerInterface $entityManager): Response
-    {
-        if (!in_array($this->getUser()->getProfile(), $conversation->getProfile()->getValues())) {
-            return $this->json($conversation->getConversationMessages()->getValues(),200,[],['groups'=>'privateMessage:read-message']);
-        }
-
-        $json = $request->getContent();
-        $message = $serializer->deserialize($json,ConversationMessage::class,'json');
-
-        if($message->getContent()==null){
-            return $this->json("error",200);
-        }
-        $message->setAuthor($this->getUser()->getProfile());
-        $message->setConversation($conversation);
-        $entityManager->persist($message);
-        $entityManager->flush();
-        return $this->json($message,200,[],['groups'=>'privateMessage:read-message']);
-
     }
     #[Route('/{id}/message/update', name: 'app_conversation_updateMessage', methods: ['PATCH'])]
     public function updateMessage(Conversation $conversation,Request $request, SerializerInterface $serializer, EntityManagerInterface $entityManager, ConversationMessageRepository $conversationMessageRepository): Response
@@ -113,11 +116,11 @@ class ConversationMessageController extends AbstractController
         return $this->json($message,200,[],['groups'=>'privateMessage:read-message']);
 
     }
-    #[Route('/{id}', name: 'app_conversation_index', methods: ['GET'])]
-    public function index(Conversation $conversation,): Response
+    #[Route('/{id}/messages', name: 'app_conversation_message_index', methods: ['GET'])]
+    public function indexMessage(Conversation $conversation,): Response
     {
         if (in_array($this->getUser()->getProfile(), $conversation->getProfile()->getValues())) {
-            return $this->json($conversation,200,[],['groups'=>'privateMessage:read-message']);
+            return $this->json($conversation->getConversationMessages()->getValues(),200,[],['groups'=>'privateMessage:read-message']);
         }
         return $this->json('error tu ne fais pas parti du groupe ');
     }
@@ -166,6 +169,18 @@ class ConversationMessageController extends AbstractController
         return $this->json($conversation,200,[],['groups'=>'conversation:read-conversation']);
     }
 
+    #[Route('/{id}/', name: 'app_conversation_index', methods: ['GET'])]
+    public function index(Conversation $conversation,PostprocessorImage $postprocessorImage): Response
+    {
+        $arrayCollection= new ArrayCollection();
+        foreach ($conversation->getConversationMessages() as  $conversationMessage){
+            $arrayCollection[]=$postprocessorImage->getImagesUrlFromConversationMessage($conversationMessage);
+        }
+        if (in_array($this->getUser()->getProfile(), $conversation->getProfile()->getValues())) {
+            return $this->json($arrayCollection,200,[],['groups'=>'privateMessage:read-message']);
+        }
+        return $this->json('error tu ne fais pas parti du groupe ');
+    }
 
 
 }

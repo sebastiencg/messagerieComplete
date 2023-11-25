@@ -15,7 +15,7 @@ use Symfony\Component\Serializer\SerializerInterface;
 #[Route('/api/group')]
 class GroupMessageController extends AbstractController
 {
-    #[Route('/{id}/messages', name: 'app_conversation_message_index', methods: ['GET'])]
+    #[Route('/{id}/messages', name: 'app_group_message_index', methods: ['GET'])]
     public function indexMessage(Group $group): Response
     {
         if (in_array($this->getUser()->getProfile(),$group->getMember()->getValues() )) {
@@ -24,7 +24,7 @@ class GroupMessageController extends AbstractController
         return $this->json('error tu ne fais pas parti du groupe ');
     }
 
-    #[Route('/{id}/message/delete', name: 'app_conversation_message_delete', methods: ['DELETE'])]
+    #[Route('/{id}/message/delete', name: 'app_group_message_delete', methods: ['DELETE'])]
     public function deleteMessage(Group $group,Request $request, GroupMessageRepository $groupMessageRepository, EntityManagerInterface $entityManager): Response
     {
         $json = $request->getContent();
@@ -46,7 +46,7 @@ class GroupMessageController extends AbstractController
         $entityManager->flush();
         return $this->json('message delete ');
     }
-    #[Route('/{id}/message/create', name: 'app_conversation_createMessage', methods: ['POST'])]
+    #[Route('/{id}/message/create', name: 'app_group_createMessage', methods: ['POST'])]
     public function createMessage(Group $group,Request $request, SerializerInterface $serializer, EntityManagerInterface $entityManager): Response
     {
         if (!in_array($this->getUser()->getProfile(), $group->getMember()->getValues())) {
@@ -67,7 +67,7 @@ class GroupMessageController extends AbstractController
         return $this->json($message,200,[],['groups'=>'GroupMessage:read-message']);
 
     }
-    #[Route('/{id}/message/update', name: 'app_conversation_updateMessage', methods: ['PATCH'])]
+    #[Route('/{id}/message/update', name: 'app_group_updateMessage', methods: ['PATCH'])]
     public function updateMessage(Group $group,Request $request , EntityManagerInterface $entityManager, GroupMessageRepository $groupMessageRepository): Response
     {
 
