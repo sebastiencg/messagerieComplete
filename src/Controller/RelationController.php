@@ -19,7 +19,7 @@ use Symfony\Component\Serializer\SerializerInterface;
 class RelationController extends AbstractController
 {
     #[Route('/', name: 'app_relation_index', methods: ['GET'])]
-    public function index(RelationRepository $relationRepository): Response
+    public function index(RelationRepository $relationRepository,): Response
     {
         return $this->json($relationRepository->relationCustom2($this->getUser()->getProfile()->getId()),200,[],['groups'=>'relation:read-onlyRelation']);
     }

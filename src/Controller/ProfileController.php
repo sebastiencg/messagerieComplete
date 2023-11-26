@@ -22,10 +22,13 @@ class ProfileController extends AbstractController
     }
 
     #[Route('/update/', name: 'app_updateProfile', methods: ['PATCH'])]
-    public function updateProfile(ProfileRepository $profileRepository, Request $request ,SerializerInterface $serializer, EntityManagerInterface $entityManager): Response
+    public function updateProfile(ProfileRepository $profileRepository ,Profile $profilet, Request $request ,SerializerInterface $serializer, EntityManagerInterface $entityManager): Response
     {
         $json = $request->getContent();
         $update = $serializer->deserialize($json,Profile::class,'json');
+        $profilet->setVisibility($update->isVisibility());
+
+
         $profile=$this->getUser()->getProfile();
         $profile->setUsername($update->getUsername());
         $entityManager->persist($profile);
