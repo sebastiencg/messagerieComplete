@@ -1131,3 +1131,232 @@ Retourne une réponse JSON indiquant si le message privé a été mis à jour av
 - Code de statut : 200 (OK)
 - Format de la réponse : JSON
 - Groups appliqués : 'privateMessage:read-message'
+# Gestion des Conversations
+
+## Créer une nouvelle conversation
+
+### Endpoint
+```
+/api/conversation/create
+```
+
+### Méthode HTTP
+```
+GET
+```
+
+### Description
+Crée une nouvelle conversation avec l'auteur actuel (l'utilisateur connecté) comme l'auteur de la conversation et le seul membre de la conversation.
+
+### Input
+Aucun (No input required)
+
+### Output
+Retourne une réponse JSON contenant la nouvelle conversation créée.
+- Code de statut : 200 (OK)
+- Format de la réponse : JSON
+- Groups appliqués : 'privateMessage:read-message'
+
+## Supprimer une conversation
+
+### Endpoint
+```
+/api/conversation/{id}/delete
+```
+
+### Méthode HTTP
+```
+DELETE
+```
+
+### Description
+Supprime une conversation spécifiée par son ID, mais seulement si l'auteur de la conversation est l'utilisateur connecté.
+
+### Input
+- `{id}`: L'objet de la conversation identifié par son ID.
+
+### Output
+Retourne une réponse JSON indiquant si la conversation a été supprimée avec succès.
+- Code de statut : 200 (OK)
+
+## Créer un nouveau message dans une conversation
+
+### Endpoint
+```
+/api/conversation/{id}/message/create
+```
+
+### Méthode HTTP
+```
+POST
+```
+
+### Description
+Crée un nouveau message dans une conversation spécifiée par son ID.
+
+### Input
+- `{id}`: L'objet de la conversation identifié par son ID.
+- `{
+  "content": "text"
+}`
+
+### Output
+Retourne une réponse JSON indiquant si le message a été créé avec succès.
+- Code de statut : 200 (OK)
+- Format de la réponse : JSON
+- Groups appliqués : 'privateMessage:read-message'
+
+## Supprimer un ou plusieurs messages dans une conversation
+
+### Endpoint
+```
+/api/conversation/{id}/message/delete
+```
+
+### Méthode HTTP
+```
+DELETE
+```
+
+### Description
+Supprime un ou plusieurs messages dans une conversation spécifiée par son ID.
+
+### Input
+- `{id}`: L'objet de la conversation identifié par son ID.
+- `[
+  {"id": "id message"}
+]`
+
+### Output
+Retourne une réponse JSON indiquant si les messages ont été supprimés avec succès.
+- Code de statut : 200 (OK)
+
+## Mettre à jour un message dans une conversation
+
+### Endpoint
+```
+/api/conversation/{id}/message/update
+```
+
+### Méthode HTTP
+```
+PATCH
+```
+
+### Description
+Met à jour un message dans une conversation spécifiée par son ID.
+
+### Input
+- `{id}`: L'objet de la conversation identifié par son ID.
+- `{
+  "id": "id message",
+  "content": "text update"
+}`
+
+### Output
+Retourne une réponse JSON indiquant si le message a été mis à jour avec succès.
+- Code de statut : 200 (OK)
+- Format de la réponse : JSON
+- Groups appliqués : 'privateMessage:read-message'
+
+## Obtenir tous les messages d'une conversation
+
+### Endpoint
+```
+/api/conversation/{id}/messages
+```
+
+### Méthode HTTP
+```
+GET
+```
+
+### Description
+Récupère tous les messages d'une conversation spécifiée par son ID.
+
+### Input
+- `{id}`: L'objet de la conversation identifié par son ID.
+
+### Output
+Retourne une réponse JSON contenant tous les messages de la conversation.
+- Code de statut : 200 (OK)
+- Format de la réponse : JSON
+- Groups appliqués : 'privateMessage:read-message'
+
+## Ajouter des profils à une conversation
+
+### Endpoint
+```
+/api/conversation/{id}/add
+```
+
+### Méthode HTTP
+```
+POST
+```
+
+### Description
+Ajoute un ou plusieurs profils à une conversation spécifiée par son ID, mais seulement si l'auteur de la conversation est l'utilisateur connecté.
+
+### Input
+- `{id}`: L'objet de la conversation identifié par son ID.
+- `[
+  {"profile": "id profile"}
+]`
+
+### Output
+Retourne une réponse JSON indiquant si les profils ont été ajoutés avec succès à la conversation.
+- Code de statut : 200 (OK)
+- Format de la réponse : JSON
+- Groups appliqués : 'conversation:read-conversation'
+
+## Supprimer des profils d'une conversation
+
+### Endpoint
+```
+/api/conversation/{id}/remove
+```
+
+### Méthode HTTP
+```
+DELETE
+```
+
+### Description
+Supprime un ou plusieurs profils d'une conversation spécifiée par son ID, mais seulement si l'auteur de la conversation est l'utilisateur connecté.
+
+### Input
+- `{id}`: L'objet de la conversation identifié par son ID.
+- `[
+  {"profile": "id profile"}
+]`
+
+### Output
+Retourne une réponse JSON indiquant si les profils ont été supprimés avec succès de la conversation.
+- Code de statut : 200 (OK)
+- Format de la réponse : JSON
+- Groups appliqués : 'conversation:read-conversation'
+
+## Obtenir tous les messages d'une conversation avec des URLs d'images
+
+### Endpoint
+```
+/api/conversation/{id}/
+```
+
+### Méthode HTTP
+```
+GET
+```
+
+### Description
+Récupère tous les messages d'une conversation spécifiée par son ID avec des URLs d'images générées.
+
+### Input
+- `{id}`: L'objet de la conversation identifié par son ID.
+
+### Output
+Retourne une réponse JSON contenant tous les messages de la conversation avec des URLs d'images.
+- Code de statut : 200 (OK)
+- Format de la réponse : JSON
+- Groups appliqués : 'privateMessage:read-message'
