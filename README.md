@@ -738,3 +738,270 @@ Supprime une réponse spécifiée par son ID au message de groupe. Seul l'auteur
 Retourne une réponse JSON indiquant si la réponse a été supprimée avec succès.
 - Code de statut : 403 (Forbidden) si l'utilisateur n'est pas l'auteur de la réponse.
 - Format de la réponse : JSON
+# Gestion des Invitations de Groupes
+
+## Obtenir toutes les invitations de groupes pour l'utilisateur actuel
+
+### Endpoint
+```
+/api/invitation/
+```
+
+### Méthode HTTP
+```
+GET
+```
+
+### Description
+Récupère toutes les invitations de groupes associées au profil de l'utilisateur actuel (connecté) en renvoyant les données au format JSON.
+
+### Input
+Aucun (No input required)
+
+### Output
+Retourne une réponse JSON contenant toutes les invitations de groupes.
+- Code de statut : 200 (OK)
+- Format de la réponse : JSON
+- Groups appliqués : 'invitation:read-all'
+
+## Créer de nouvelles invitations pour un groupe spécifique
+
+### Endpoint
+```
+/api/invitation/create/group/{id}/
+```
+
+### Méthode HTTP
+```
+POST
+```
+
+### Description
+Crée de nouvelles invitations pour un groupe spécifié par son ID en utilisant les données JSON fournies dans la requête.
+
+### Input
+- `{id}`: L'objet du groupe identifié par son ID.
+
+```json
+[
+ { "profile": 1 },
+ { "profile": 2 },
+ ...
+]
+```
+
+### Output
+Retourne une réponse JSON indiquant si les invitations ont été envoyées avec succès.
+- Code de statut : 200 (OK)
+- Format de la réponse : JSON
+
+## Refuser une invitation
+
+### Endpoint
+```
+/api/invitation/{id}/denied
+```
+
+### Méthode HTTP
+```
+DELETE
+```
+
+### Description
+Refuse une invitation spécifiée par son ID. L'invitation ne peut être refusée que par le destinataire ou si elle n'est pas encore validée.
+
+### Input
+- `{id}`: L'objet de l’invitation identifiée par son ID.
+
+### Output
+Retourne une réponse JSON indiquant si l'invitation a été refusée avec succès.
+- Code de statut : 200 (OK)
+- Format de la réponse : JSON
+
+## Accepter une invitation
+
+### Endpoint
+```
+/api/invitation/{id}/accepted
+```
+
+### Méthode HTTP
+```
+GET
+```
+
+### Description
+Accepte une invitation spécifiée par son ID. L'invitation ne peut être acceptée que par le destinataire ou si elle n'est pas encore validée.
+
+### Input
+- `{id}`: L'objet de l’invitation identifiée par son ID.
+
+### Output
+Retourne une réponse JSON indiquant si l'invitation a été acceptée avec succès.
+- Code de statut : 200 (OK)
+- Format de la réponse : JSON
+# Gestion des Relations
+
+## Obtenir toutes les relations de l'utilisateur actuel
+
+### Endpoint
+```
+/api/relation/
+```
+
+### Méthode HTTP
+```
+GET
+```
+
+### Description
+Récupère toutes les relations associées au profil de l'utilisateur actuel (connecté) en renvoyant les données au format JSON.
+
+### Input
+Aucun (No input required)
+
+### Output
+Retourne une réponse JSON contenant toutes les relations.
+- Code de statut : 200 (OK)
+- Format de la réponse : JSON
+- Groups appliqués : 'relation:read-onlyRelation'
+
+## Nouvelle demande d'amitié
+
+### Endpoint
+```
+/api/relation/new/{id}
+```
+
+### Méthode HTTP
+```
+GET et POST
+```
+
+### Description
+Crée une nouvelle demande d'amitié entre l'utilisateur actuel et un autre profil spécifié par son ID.
+
+### Input
+- `{id}`: L'objet du profile identifié par son ID.
+
+### Output
+Retourne une réponse JSON indiquant si la demande d'amitié a été envoyée avec succès.
+- Code de statut : 200 (OK)
+- Format de la réponse : JSON
+
+## Demande d'amitié reçue
+
+### Endpoint
+```
+/api/relation/requestReceived/
+```
+
+### Méthode HTTP
+```
+GET
+```
+
+### Description
+Récupère toutes les demandes d'amitié reçues par l'utilisateur actuel en renvoyant les données au format JSON.
+
+### Input
+Aucun (No input required)
+
+### Output
+Retourne une réponse JSON contenant toutes les demandes d'amitié reçues.
+- Code de statut : 200 (OK)
+- Format de la réponse : JSON
+- Groups appliqués : 'relation:read-one'
+
+## Demandes d'amitié envoyées
+
+### Endpoint
+```
+/api/relation/requestSend/
+```
+
+### Méthode HTTP
+```
+GET
+```
+
+### Description
+Récupère toutes les demandes d'amitié envoyées par l'utilisateur actuel en renvoyant les données au format JSON.
+
+### Input
+Aucun (No input required)
+
+### Output
+Retourne une réponse JSON contenant toutes les demandes d'amitié envoyées.
+- Code de statut : 200 (OK)
+- Format de la réponse : JSON
+- Groups appliqués : 'relation:read-one'
+
+## Accepter une demande d'amitié
+
+### Endpoint
+```
+/api/relation/request/valid/{id}
+```
+
+### Méthode HTTP
+```
+GET
+```
+
+### Description
+Accepte une demande d'amitié spécifiée par l'ID du profil. La demande d'amitié doit être en attente.
+
+### Input
+- `{id}`: L'objet du profile identifié par son ID.
+
+### Output
+Retourne une réponse JSON indiquant si la demande d'amitié a été acceptée avec succès.
+- Code de statut : 200 (OK)
+- Format de la réponse : JSON
+
+## Refuser une demande d'amitié
+
+### Endpoint
+```
+/api/relation/request/refuse/{id}
+```
+
+### Méthode HTTP
+```
+GET
+```
+
+### Description
+Refuse une demande d'amitié spécifiée par l'ID du profil. La demande d'amitié doit être en attente.
+
+### Input
+- `{id}`: L'objet du profile identifié par son ID.
+
+### Output
+Retourne une réponse JSON indiquant si la demande d'amitié a été refusée avec succès.
+- Code de statut : 200 (OK)
+- Format de la réponse : JSON
+
+## Refuser une relation (unfriend)
+
+### Endpoint
+```
+/api/relation/denied/{id}
+```
+
+### Méthode HTTP
+```
+DELETE
+```
+
+### Description
+Refuse une relation spécifiée par l'ID du profil.
+
+### Input
+- `{id}`: L'objet du profile identifié par son ID.
+
+### Output
+Retourne une réponse JSON indiquant si la relation a été refusée avec succès.
+- Code de statut : 200 (OK)
+- Format de la réponse : JSON
