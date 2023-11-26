@@ -289,6 +289,7 @@ Met à jour le contenu d'un message dans la communauté spécifiée par son ID, 
 - `{id}`: L'objet de la communauté identifiée par son ID.
 ```json
 {
+   "id":"id message update"
    "content":"content update here"
 }
 ```
