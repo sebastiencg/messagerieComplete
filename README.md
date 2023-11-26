@@ -298,3 +298,214 @@ Met à jour le contenu d'un message dans la communauté spécifiée par son ID, 
 Retourne une réponse JSON contenant les détails du message mis à jour.
 - Code de statut : 200 (OK)
 - Format de la réponse : JSON
+# Gestion des Groupes
+
+## Obtenir tous les groupes
+
+### Endpoint
+```
+/api/group/
+```
+
+### Méthode HTTP
+```
+GET
+```
+
+### Description
+Récupère tous les groupes associés au profil de l'utilisateur actuel (connecté) en renvoyant les données au format JSON.
+
+### Input
+Aucun (No input required)
+
+### Output
+Retourne une réponse JSON contenant tous les groupes associés au profil de l'utilisateur actuel.
+- Code de statut : 200 (OK)
+- Format de la réponse : JSON
+
+## Créer un nouveau groupe
+
+### Endpoint
+```
+/api/group/new
+```
+
+### Méthode HTTP
+```
+POST
+```
+
+### Description
+Crée un nouveau groupe en utilisant les données JSON fournies dans la requête.
+
+### Input
+```json
+{
+ "name": "Nom du groupe"
+}
+```
+
+### Output
+Retourne une réponse JSON contenant les détails du nouveau groupe créé.
+- Code de statut : 200 (OK)
+- Format de la réponse : JSON
+
+## Exclure un membre d'un groupe
+
+### Endpoint
+```
+/api/group/{id}/member/exclude
+```
+
+### Méthode HTTP
+```
+DELETE
+```
+
+### Description
+Exclut un membre spécifié du groupe. Seuls les administrateurs du groupe peuvent effectuer cette action.
+
+### Input
+`{id}`: L'objet du groupe identifié par son ID.
+```json
+{
+    "id": "ID du profil à exclure"
+}
+```
+
+### Output
+Retourne une réponse JSON indiquant si le membre a été exclu avec succès du groupe.
+- Code de statut : 200 (OK)
+- Format de la réponse : JSON
+
+## Promouvoir un membre au statut d'administrateur
+
+### Endpoint
+```
+/api/group/{id}/member/promote
+```
+
+### Méthode HTTP
+```
+POST
+```
+
+### Description
+Promeut un membre spécifié au statut d'administrateur dans le groupe. Seuls les administrateurs du groupe peuvent effectuer cette action.
+
+### Input
+`{id}`: L'objet du groupe identifié par son ID.
+```json
+{
+    "id": "ID du profil à promouvoir"
+}
+```
+
+### Output
+Retourne une réponse JSON indiquant si le membre a été promu avec succès au statut d'administrateur.
+- Code de statut : 200 (OK)
+- Format de la réponse : JSON
+
+## Rétrograder un administrateur au statut de membre
+
+### Endpoint
+```
+/api/group/{id}/member/demote
+```
+
+### Méthode HTTP
+```
+POST
+```
+
+### Description
+Rétrograde un administrateur spécifié au statut de membre dans le groupe. Seuls les administrateurs du groupe peuvent effectuer cette action.
+
+### Input
+`{id}`: L'objet du groupe identifié par son ID.
+```json
+{
+    "id": "ID du profil à rétrograder"
+}
+```
+
+### Output
+Retourne une réponse JSON indiquant si l'administrateur a été rétrogradé avec succès au statut de membre.
+- Code de statut : 200 (OK)
+- Format de la réponse : JSON
+
+## Obtenir les détails d'un groupe spécifique
+
+### Endpoint
+```
+/api/group/{id}
+```
+
+### Méthode HTTP
+```
+GET
+```
+
+### Description
+Récupère les détails du groupe spécifié par son ID en renvoyant les données au format JSON.
+
+### Input
+`{id}`: L'objet du groupe identifié par son ID.
+
+### Output
+Retourne une réponse JSON contenant les détails du groupe spécifié.
+- Code de statut : 200 (OK)
+- Format de la réponse : JSON
+- Groups appliqués : 'group:read-all'
+
+## Éditer les détails d'un groupe
+
+### Endpoint
+```
+/api/group/{id}/edit
+```
+
+### Méthode HTTP
+```
+PATCH
+```
+
+### Description
+Édite les détails du groupe spécifié par son ID en utilisant les données JSON fournies dans la requête. Seul l'auteur du groupe peut effectuer cette action.
+
+### Input
+`{id}`: L'objet du groupe identifié par son ID.
+```json
+{
+ "name": "Nom du groupe"
+}
+```
+
+### Output
+Retourne une réponse JSON contenant les détails mis à jour du groupe.
+- Code de statut : 200 (OK)
+- Format de la réponse : JSON
+- Groups appliqués : 'group:read-all'
+
+## Supprimer un groupe
+
+### Endpoint
+```
+/api/group/{id}/delete
+```
+
+### Méthode HTTP
+```
+DELETE
+```
+
+### Description
+Supprime le groupe spécifié par son ID, uniquement si l'utilisateur actuel est l'auteur du groupe.
+
+### Input
+`{id}`: L'objet du groupe identifié par son ID.
+
+### Output
+Retourne une réponse JSON indiquant si le groupe a été supprimé avec succès.
+- Code de statut : 200 (OK)
+- Format de la réponse : JSON
