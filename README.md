@@ -509,3 +509,232 @@ Supprime le groupe spécifié par son ID, uniquement si l'utilisateur actuel est
 Retourne une réponse JSON indiquant si le groupe a été supprimé avec succès.
 - Code de statut : 200 (OK)
 - Format de la réponse : JSON
+# Gestion des Messages dans un Groupe
+
+## Obtenir tous les messages d'un groupe
+
+### Endpoint
+```
+/api/group/{id}/messages
+```
+
+### Méthode HTTP
+```
+GET
+```
+
+### Description
+Récupère tous les messages associés au groupe spécifié par son ID en renvoyant les données au format JSON.
+
+### Input
+`{id}`: L'objet du groupe identifié par son ID.
+
+### Output
+Retourne une réponse JSON contenant tous les messages du groupe.
+- Code de statut : 200 (OK)
+- Format de la réponse : JSON
+- Groups appliqués : 'GroupMessage:read-message'
+
+## Supprimer un ou plusieurs messages d'un groupe
+
+### Endpoint
+```
+/api/group/{id}/message/delete
+```
+
+### Méthode HTTP
+```
+DELETE
+```
+
+### Description
+Supprime un ou plusieurs messages spécifiés par leur ID dans le groupe. Seul l'auteur du message peut effectuer cette action.
+
+### Input
+`{id}`: L'objet du groupe identifié par son ID.
+
+```json
+[
+	{"message": "id du message a supprimer"},
+	{"message": "id du message a supprimer"},
+]
+```
+
+### Output
+Retourne une réponse JSON indiquant si les messages ont été supprimés avec succès.
+- Code de statut : 200 (OK)
+- Format de la réponse : JSON
+
+## Créer un nouveau message dans un groupe
+
+### Endpoint
+```
+/api/group/{id}/message/create
+```
+
+### Méthode HTTP
+```
+POST
+```
+
+### Description
+Crée un nouveau message dans le groupe spécifié par son ID en utilisant les données JSON fournies dans la requête.
+
+### Input
+`{id}`: L'objet du groupe identifié par son ID.
+
+```json
+{
+ "content": "Contenu du message"
+}
+```
+
+### Output
+Retourne une réponse JSON contenant les détails du nouveau message créé.
+- Code de statut : 200 (OK)
+- Format de la réponse : JSON
+- Groups appliqués : 'GroupMessage:read-message'
+
+## Mettre à jour le contenu d'un message dans un groupe
+
+### Endpoint
+```
+/api/group/{id}/message/update
+```
+
+### Méthode HTTP
+```
+PATCH
+```
+
+### Description
+Met à jour le contenu d'un message spécifié par son ID dans le groupe. Seul l'auteur du message peut effectuer cette action.
+
+### Input
+`{id}`: L'objet du groupe identifié par son ID.
+
+```json
+{
+ "id": "id du message a update",
+ "content": "Nouveau contenu du message"
+}
+```
+
+### Output
+Retourne une réponse JSON contenant les détails mis à jour du message.
+- Code de statut : 200 (OK)
+- Format de la réponse : JSON
+- Groups appliqués : 'GroupMessage:read-message'
+# Gestion des Réponses à un Message de Groupe
+
+## Obtenir toutes les réponses à un message de groupe
+
+### Endpoint
+```
+/api/group/{groupId}/message/{messageId}/
+```
+
+### Méthode HTTP
+```
+GET
+```
+
+### Description
+Récupère toutes les réponses associées à un message de groupe spécifié par son ID en renvoyant les données au format JSON.
+
+### Input
+- `{groupId}`: L'objet du groupe identifié par son ID.
+- `{messageId}`: L'objet du message identifié par son ID.
+
+### Output
+Retourne une réponse JSON contenant toutes les réponses au message de groupe.
+- Code de statut : 200 (OK)
+- Format de la réponse : JSON
+- Groups appliqués : 'responseMessage:all-response'
+
+## Créer une nouvelle réponse à un message de groupe
+
+### Endpoint
+```
+/api/group/{groupId}/message/{messageId}/response/create
+```
+
+### Méthode HTTP
+```
+POST
+```
+
+### Description
+Crée une nouvelle réponse au message de groupe spécifié par son ID en utilisant les données JSON fournies dans la requête.
+
+### Input
+- `{groupId}`: L'objet du groupe identifié par son ID.
+- `{messageId}`: L'objet du message identifié par son ID.
+
+```json
+{
+ "content": "Contenu de la réponse"
+}
+```
+
+### Output
+Retourne une réponse JSON contenant les détails de la nouvelle réponse créée.
+- Code de statut : 200 (OK)
+- Format de la réponse : JSON
+- Groups appliqués : 'responseMessage:read-response'
+
+## Mettre à jour le contenu d'une réponse à un message de groupe
+
+### Endpoint
+```
+/api/group/{groupId}/message/{messageId}/response/{responseId}/update
+```
+
+### Méthode HTTP
+```
+POST
+```
+
+### Description
+Met à jour le contenu d'une réponse spécifiée par son ID au message de groupe. Seul l'auteur de la réponse peut effectuer cette action.
+
+### Input
+- `{groupId}`: L'objet du groupe identifié par son ID.
+- `{messageId}`: L'objet du message identifié par son ID.
+
+```json
+{
+ "content": "Nouveau contenu de la réponse"
+}
+```
+
+### Output
+Retourne une réponse JSON contenant les détails mis à jour de la réponse.
+- Code de statut : 200 (OK)
+- Format de la réponse : JSON
+- Groups appliqués : 'responseMessage:read-response'
+
+## Supprimer une réponse à un message de groupe
+
+### Endpoint
+```
+/api/group/{groupId}/message/{messageId}/response/{responseId}/delete
+```
+
+### Méthode HTTP
+```
+DELETE
+```
+
+### Description
+Supprime une réponse spécifiée par son ID au message de groupe. Seul l'auteur de la réponse peut effectuer cette action.
+
+### Input
+- `{groupId}`: L'objet du groupe identifié par son ID.
+- `{messageId}`: L'objet du message identifié par son ID.
+- `{responseId}`: L'objet de la réponse identifié par son ID.
+
+### Output
+Retourne une réponse JSON indiquant si la réponse a été supprimée avec succès.
+- Code de statut : 403 (Forbidden) si l'utilisateur n'est pas l'auteur de la réponse.
+- Format de la réponse : JSON
