@@ -983,7 +983,7 @@ Retourne une réponse JSON indiquant si la demande d'amitié a été refusée av
 - Code de statut : 200 (OK)
 - Format de la réponse : JSON
 
-## Refuser une relation (unfriend)
+## supprimer une relation (unfriend)
 
 ### Endpoint
 ```
@@ -996,7 +996,7 @@ DELETE
 ```
 
 ### Description
-Refuse une relation spécifiée par l'ID du profil.
+supprime une relation spécifiée par l'ID du profil.
 
 ### Input
 - `{id}`: L'objet du profile identifié par son ID.
@@ -1005,3 +1005,129 @@ Refuse une relation spécifiée par l'ID du profil.
 Retourne une réponse JSON indiquant si la relation a été refusée avec succès.
 - Code de statut : 200 (OK)
 - Format de la réponse : JSON
+# Gestion des Messages Privés
+
+## Obtenir tous les messages privés entre l'utilisateur actuel et un autre profil
+
+### Endpoint
+```
+/api/message/profile/{id}
+```
+
+### Méthode HTTP
+```
+GET
+```
+
+### Description
+Récupère tous les messages privés entre l'utilisateur actuel (l'auteur) et un autre profil spécifié par son ID (le destinataire).
+
+### Input
+- `{id}`: L'objet du profile identifié par son ID.
+
+### Output
+Retourne une réponse JSON contenant tous les messages privés entre l'utilisateur actuel et le profil spécifié.
+- Code de statut : 200 (OK)
+- Format de la réponse : JSON
+- Groups appliqués : 'privateMessage:read-message'
+
+## Obtenir un message privé spécifique
+
+### Endpoint
+```
+/api/message/{id}
+```
+
+### Méthode HTTP
+```
+GET
+```
+
+### Description
+Récupère un message privé spécifique par son ID.
+
+### Input
+- `{id}`: L'objet du message identifié par son ID.
+
+### Output
+Retourne une réponse JSON contenant le message privé spécifié.
+- Code de statut : 200 (OK)
+- Format de la réponse : JSON
+- Groups appliqués : 'privateMessage:read-message'
+
+## Créer un nouveau message privé
+
+### Endpoint
+```
+/api/message/create/{id}
+```
+
+### Méthode HTTP
+```
+POST
+```
+
+### Description
+Crée un nouveau message privé entre l'utilisateur actuel et un autre profil spécifié par son ID.
+
+### Input
+- `{id}`: L'objet du profile identifié par son ID.
+- `{
+  "content": "text",
+  "associatedImages": "id de l'image associée (optionnel)"
+}`
+
+### Output
+Retourne une réponse JSON indiquant si le message privé a été créé avec succès.
+- Code de statut : 200 (OK)
+- Format de la réponse : JSON
+- Groups appliqués : 'privateMessage:read-message'
+
+## Supprimer un message privé
+
+### Endpoint
+```
+/api/message/delete/{id}
+```
+
+### Méthode HTTP
+```
+DELETE
+```
+
+### Description
+Supprime un message privé spécifié par son ID.
+
+### Input
+- `{id}`: L'objet du message identifié par son ID.
+
+### Output
+Retourne une réponse JSON indiquant si le message privé a été supprimé avec succès.
+- Code de statut : 200 (OK)
+
+## Mettre à jour un message privé
+
+### Endpoint
+```
+/api/message/update/{id}
+```
+
+### Méthode HTTP
+```
+PATCH
+```
+
+### Description
+Met à jour un message privé spécifié par son ID.
+
+### Input
+- `{id}`: L'objet du message identifié par son ID.
+- `{
+  "content": "text"
+}`
+
+### Output
+Retourne une réponse JSON indiquant si le message privé a été mis à jour avec succès.
+- Code de statut : 200 (OK)
+- Format de la réponse : JSON
+- Groups appliqués : 'privateMessage:read-message'
