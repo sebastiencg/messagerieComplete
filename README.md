@@ -1360,3 +1360,151 @@ Retourne une réponse JSON contenant tous les messages de la conversation avec d
 - Code de statut : 200 (OK)
 - Format de la réponse : JSON
 - Groups appliqués : 'privateMessage:read-message'
+# Gestion des Profils et des Images
+
+## Obtenir le profil de l'utilisateur connecté
+
+### Endpoint
+```
+/api/profile
+```
+
+### Méthode HTTP
+```
+GET
+```
+
+### Description
+Récupère le profil de l'utilisateur connecté.
+
+### Input
+Aucun.
+
+### Output
+Retourne une réponse JSON contenant le profil de l'utilisateur connecté.
+- Code de statut : 200 (OK)
+- Format de la réponse : JSON
+- Groups appliqués : 'profile:read-all'
+
+## Mettre à jour le profil de l'utilisateur connecté
+
+### Endpoint
+```
+/api/profile/update
+```
+
+### Méthode HTTP
+```
+PATCH
+```
+
+### Description
+Met à jour le profil de l'utilisateur connecté avec les informations fournies.
+
+### Input
+```
+{
+  "username": "new username"
+}
+```
+
+### Output
+Retourne une réponse JSON contenant le profil mis à jour de l'utilisateur connecté.
+- Code de statut : 200 (OK)
+- Format de la réponse : JSON
+- Groups appliqués : 'profile:read-all'
+
+## Obtenir tous les profils visibles
+
+### Endpoint
+```
+/api/profile/allProfile
+```
+
+### Méthode HTTP
+```
+GET
+```
+
+### Description
+Récupère tous les profils dont la visibilité est définie sur true.
+
+### Input
+Aucun.
+
+### Output
+Retourne une réponse JSON contenant tous les profils dont la visibilité est true.
+- Code de statut : 200 (OK)
+- Format de la réponse : JSON
+- Groups appliqués : 'relation:read-one'
+
+## Rechercher des profils par nom d'utilisateur
+
+### Endpoint
+```
+/api/profile/searchProfile
+```
+
+### Méthode HTTP
+```
+POST
+```
+
+### Description
+Recherche des profils par nom d'utilisateur.
+
+### Input
+```
+{
+  "username": "new username"
+}
+```
+
+### Output
+Retourne une réponse JSON contenant les profils correspondant à la recherche par nom d'utilisateur.
+- Code de statut : 200 (OK)
+- Format de la réponse : JSON
+- Groups appliqués : 'profile:read-one'
+
+## Télécharger une image
+
+### Endpoint
+```
+/api/image/upload
+```
+
+### Méthode HTTP
+```
+POST
+```
+
+### Description
+Permet à l'utilisateur de télécharger une image. L'image est associée à l'auteur (profil) de l'utilisateur connecté.
+
+### Input
+image
+
+### Output
+Retourne une réponse JSON indiquant le succès du téléchargement.
+- Contient le message "Bravo pour ton upload, tu peux maintenant ajouter ton message" et l'identifiant de l'image téléchargée (idImage).
+- Code de statut : 200 (OK)
+- Format de la réponse : JSON
+### Gestion des utilisateurs
+
+25. **Obtenir un token (login)**
+    - Route : `/api/login_check`
+    - Méthode HTTP : POST
+    - Description : Cette route est utilisée pour authentifier un utilisateur en vérifiant les informations de connexion fournies. Lorsqu'un utilisateur tente de se connecter à l'application, les identifiants (email et mot de passe) sont envoyés au serveur via cette route. Le serveur vérifie ensuite ces informations par rapport à sa base de données d'utilisateurs.
+    - Exemple de corps de requête au format JSON :{"email": "email","password":"password"}
+
+26. **Obtenir un token rafraichi**
+    - Route : `/api/token/refresh`
+    - Méthode HTTP : POST
+    - Description : Description : Cette route permet à un utilisateur de demander le rafraîchissement de son jeton d'authentification. Les jetons d'authentification sont utilisés pour maintenir la session de l'utilisateur actif et sécurisée. Lorsqu'un utilisateur se connecte à l'application, il reçoit un jeton d'accès (access token) qui a une durée de validité limitée. Le jeton d'actualisation (refresh token) est utilisé pour obtenir un nouveau jeton d'accès une fois que le jeton actuel a expiré.
+    - Exemple de corps de requête au format JSON :{"token": "token"}
+   
+27. **creer un utilisateur**
+    - Route : `/register`
+    - Méthode HTTP : POST
+    - Description : Cette route est utilisée pour creer un utilisateur.
+    - Exemple de corps de requête au format JSON :{"email": "email","password":"password"}
