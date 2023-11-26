@@ -1,4 +1,4 @@
-# Community API
+# API DOC
 
 ## Obtenir toutes les communautés
 
