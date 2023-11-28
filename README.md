@@ -1403,7 +1403,7 @@ Met à jour le profil de l'utilisateur connecté avec les informations fournies.
 ### Input
 ```
 {
-  "username": "new username"
+  "username": "new username","visibility":true or false
 }
 ```
 
